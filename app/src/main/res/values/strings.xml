@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Asas Cloud</string>
+    <string name="privacy_policy" translatable="false">privacy Policy</string>
+    <string name="google_id" translatable="false">768343075532-jm2k3eqk0alr4cda7vdkimrtde9hshr0.apps.googleusercontent.com</string>
+    <string name="title_activity_splish" translatable="false">FullscreenActivity</string>
+    <string name="dummy_button" translatable="false">Dummy Button</string>
+    <string name="dummy_content" translatable="false">DUMMY\nCONTENT</string>
+    <string name="facebook_app_id" translatable="false">5341344422616771</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb5341344422616771</string>
+    <string name="facebook_client_token" translatable="false">ac1ad6dd6a6a5bc0f9d8e171889e5b8a</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="track_selection_title" translatable="false">Video Quality</string>
+    <string name="feild_reqird" translatable="false">Field reqird</string>
+    <string name="reqird_crekter" translatable="false">itlest 4 crekter is reqird</string>
+    <string name="play_console_license" translatable="false">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhOnG4+VFuerG1w7Tfzhpsixd4S+R3chJxNWhDd2QFV6XRCgc0cZB07DXrD8b9sbW1eC0XMGZL/iHTIv1FWv+b9p7nHF2mWtzzCh/5n88Ae49g18jlMdCh/1H7bcL4qdea/BEwoPEvmcnGltihWugdKNOdzJ1XgxLoFdOaJ4qg617ZNH6qPgJak1J0UfKw8SAD0cooJNt0q1j4B+VWlY3sV2ZFf7thVaSOLGZ8cz2b55tXAU5XKXYqfg9+SC5PVlDM7gCbhbwT4BpDcuRnuQXkxude7MoONEMRgYOUqCz1eVdY3D6EPd+cP4Ff4rHOOirnX3EsF4Z5rt/qXh+AsLOfQIDAQAB</string>
+    <string name="premium1" translatable="false">asas1</string>
+    <string name="premium2" translatable="false">asas2</string>
+    <string name="premium3" translatable="false">asas3</string>
+</resources>

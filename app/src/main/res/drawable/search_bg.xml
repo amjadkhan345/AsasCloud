@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~
+  ~  Created by Amjad khan on 6/30/22 1:51 PM
+  ~  Copyright (c) 2022 . All rights reserved.
+  ~  Last modified 6/30/22 1:51 PM
+  ~
+  ~
+  -->
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="8dp"/>
+    <stroke android:color="@color/purple_200"
+        />
+</shape>

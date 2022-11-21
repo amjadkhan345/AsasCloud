@@ -1,0 +1,20 @@
+<!--
+  ~
+  ~  Created by Amjad khan on 6/28/22 6:56 PM
+  ~  Copyright (c) 2022 . All rights reserved.
+  ~  Last modified 6/28/22 6:56 PM
+  ~
+  ~
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal"
+    android:autoMirrored="true">
+  <path
+      android:fillColor="@color/teal_200"
+      android:pathData="M2.01,21L23,12 2.01,3 2,10l15,2 -15,2z"/>
+</vector>
