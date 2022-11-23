@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.asas.cloud.R;
 import com.asas.cloud.classes.References;
+import com.asas.cloud.classes.Uttilties;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,7 +33,7 @@ import com.google.firebase.storage.UploadTask;
 public class ProfileActivity extends AppCompatActivity {
 
     ImageView profile_image;
-    TextView name, email,contry, number;
+    TextView name, email,contry, number, size_view;
 
     FirebaseAuth auth;
     FirebaseUser user;
@@ -51,6 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
         userId=References.UserId;
         reference= References.User_Reference;//database.getReference().child(U)
         profile_image=findViewById(R.id.profile_image1);
+        size_view=findViewById(R.id.file_size);
         name=findViewById(R.id.user_name);
         email=findViewById(R.id.user_email);
         contry=findViewById(R.id.contry_name);
@@ -75,17 +77,16 @@ public class ProfileActivity extends AppCompatActivity {
                         contry.setText(snapshot.child("country").getValue().toString());
                         number.setText(snapshot.child("phoneNumber").getValue().toString());
                         Glide.with(ProfileActivity.this).load(snapshot.child("profileurl").getValue().toString()).into(profile_image);
-                        //Glide.with(ProfileActivity.this).load(profileamage).into(profile_image);
-                        /*if(profileamage.equals("abc")){
-                            profile_image.setImageDrawable(getDrawable(R.drawable.ic_user_circle_24));
-                            profile_image.setClickable(true);
+                        String size=snapshot.child("size").getValue().toString();
+                        long kb= Long.parseLong(size);
+                        String filesize = Uttilties.FileSize(kb);
+                        String user_storage= snapshot.child("user_storage").getValue().toString();
+                        long user_stoarge=Long.parseLong(user_storage);
+                        String storage_gb= Uttilties.FileSize(user_stoarge);
+                        String show_storage= filesize + "/" + storage_gb;
+                        size_view.setText(show_storage);
+                        //name.setText(filesize);
 
-                        }else {
-                            profile_image.setClickable(false);
-                            Glide.with(ProfileActivity.this).load(snapshot.child("profileurl").getValue().toString()).into(profile_image);
-                        }
-
-                        }*/
                     }
                 }
             }

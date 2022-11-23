@@ -1,7 +1,6 @@
 package com.asas.cloud.fragment;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -12,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,8 +40,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnPausedListener;
 import com.google.firebase.storage.OnProgressListener;
@@ -62,6 +63,7 @@ public class HomeFragment extends Fragment {
     int  FILE_SELECT_CODE = 101;
     byte[] image;
     String imgString;
+    Bitmap bitmap ;
 
     private Uri ImageUri;
     ArrayList ImageList = new ArrayList();
@@ -73,8 +75,10 @@ public class HomeFragment extends Fragment {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference = References.Video_Reference;//database.getReference().child("File");
     DatabaseReference imagerefrance= References.Image_Reference;
+    DatabaseReference Userref = References.User_Reference;
     StorageReference storageRef = storage.getReference();
     StorageReference imagesRef = storageRef.child("File");
+    DatabaseReference user_storage=References.User_Reference; //database.getReference();
     FirebaseAuth auth;
     FirebaseUser user;
     FragmentContainerView layout;
@@ -84,6 +88,8 @@ public class HomeFragment extends Fragment {
     UploadTask uploadTask;
     ProgressDialog pd;
     String user_id, username, userprofile,user_uuid;
+    String totale_size, use_size;
+    int tootle, use;
 
 
 
@@ -113,20 +119,43 @@ public class HomeFragment extends Fragment {
         //adapter.notifyDataSetChanged();
         //adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
+        user_storage.child(user_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    totale_size = snapshot.child("user_storage").getValue().toString();
+                    tootle = Integer.parseInt(totale_size);//Long.parseLong(totale_size);
+                    use_size = snapshot.child("size").getValue().toString();
+                    use = Integer.parseInt(use_size);//Long.parseLong(use_size);
+                    //Toast.makeText(getContext(), totale_size, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         button.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("IntentReset")
             @Override
             public void onClick(View v) {
+                if (use>tootle){
+                    //case use>tootle:
+                    Toast.makeText(getContext(), " Your don't have Free space", Toast.LENGTH_SHORT).show();
+                }else {
+                    //Toast.makeText(getContext(), (int) tootle, Toast.LENGTH_SHORT).show();
 
-                //Intent intent = new Intent(Intent.ACTION_PICK);
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-                //intent.setType("image/* , video/*");
-                String[] mimetypes = {"image/*", "video/*"};
-                intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                //startActivityForResult(intent, FILE_SELECT_CODE);
-                startActivityForResult(Intent.createChooser(intent,"Select Picture"), FILE_SELECT_CODE);
+                    //Intent intent = new Intent(Intent.ACTION_PICK);
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                    //intent.setType("image/* , video/*");
+                    String[] mimetypes = {"image/*", "video/*"};
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    //startActivityForResult(intent, FILE_SELECT_CODE);
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), FILE_SELECT_CODE);
                 /*intent.addCategory(Intent.CATEGORY_OPENABLE);
 
                 try {
@@ -139,13 +168,10 @@ public class HomeFragment extends Fragment {
                             Toast.LENGTH_SHORT).show();
 
                 }*/
+                }
 
             }
         });
-
-
-
-
 
         return view;
     }
@@ -157,172 +183,188 @@ public class HomeFragment extends Fragment {
         if (resultCode == RESULT_OK && requestCode == FILE_SELECT_CODE) {
 
             //if (data.getClipData() == null) {
-                // Get the Uri of the selected file
-                Uri uri1 = data.getData();
-                String[] columns = {MediaStore.Images.Media.DATA,
-                        MediaStore.Images.Media.MIME_TYPE};
+            // Get the Uri of the selected file
+            Uri uri1 = data.getData();
+            String[] columns = {MediaStore.Images.Media.DATA,
+                    MediaStore.Images.Media.MIME_TYPE};
 
-                Cursor cursor = getActivity().getContentResolver().query(uri1, columns, null, null, null);
-                cursor.moveToFirst();
+            Cursor cursor = getActivity().getContentResolver().query(uri1, columns, null, null, null);
+            cursor.moveToFirst();
 
-                int pathColumnIndex = cursor.getColumnIndex(columns[0]);
-                int mimeTypeColumnIndex = cursor.getColumnIndex(columns[1]);
+            int pathColumnIndex = cursor.getColumnIndex(columns[0]);
+            int mimeTypeColumnIndex = cursor.getColumnIndex(columns[1]);
 
-                String contentPath = cursor.getString(pathColumnIndex);
-                String mimeType = cursor.getString(mimeTypeColumnIndex);
-                cursor.close();
-                Log.d(TAG, "File Uri: " + uri1.toString());
-                String filetype = Uttilties.getfiletype(getContext(), uri1);
-                Log.d("type", "File type is  " + filetype);
-                Toast.makeText(getContext(), "file Type is " + filetype, Toast.LENGTH_SHORT).show();
-                if (mimeType.startsWith("video")) {
-                    StorageReference riversRef = storageRef.child("Video/" + uri1.getLastPathSegment());
-                    pd = new ProgressDialog(getActivity());
-                    pd.setCancelable(false);
-                    pd.show();
-                    uploadTask = riversRef.putFile(uri1);
-                    uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                            double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                            System.out.println("done");
+            String contentPath = cursor.getString(pathColumnIndex);
+            String mimeType = cursor.getString(mimeTypeColumnIndex);
+            cursor.close();
 
-                            pd.setMessage(((int) progress) + "% uploaded");
-                            //pd.show();
-                        }
-                    }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
-                            System.out.println("Upload is paused");
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            pd.dismiss();
-                            // Handle unsuccessful uploads
-                            //Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
-                        }
-                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            riversRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    Bitmap bitmap = ImageResize.getThumbVideo(getContext(), uri1);
-                                    byte[] image = ImageResize.getBytesFromBitmap(bitmap);
-                                    String imgString = Base64.encodeToString(image, Base64.NO_WRAP);
-                                    String videoid = Uttilties.getRandomString(10);
-                                    VideoModel model = new VideoModel();
-                                    model.setId(videoid);
-                                    model.setThambnel(imgString);
-                                    model.setVideo(uri.toString());
-                                    Date c = Calendar.getInstance().getTime();
-                                    model.setData(c);
-                                    model.setVideo_Name(ImageResize.getFileName(getContext(), uri1));
-                                    databaseReference.child(user_id).child(videoid).setValue(model);
-                                    pd.dismiss();
-                                    //Toast.makeText(getActivity(), "file name is " + ImageResize.getFileName(getContext(), uri1), Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(getActivity(), MainActivity.class));
+            if (mimeType.startsWith("video")) {
+                StorageReference riversRef = storageRef.child("Video/" + uri1.getLastPathSegment());
+                pd = new ProgressDialog(getActivity());
+                pd.setCancelable(false);
+                pd.setTitle("Upload File");
+                pd.show();
+                uploadTask = riversRef.putFile(uri1);
+                uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                        System.out.println("done");
 
-                                }
-                            });
+                        pd.setMessage(((int) progress) + "% Uploading...");
+                        //pd.show();
+                    }
+                }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
+                        System.out.println("Upload is paused");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        pd.dismiss();
+                        // Handle unsuccessful uploads
+                        //Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        riversRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                long fileSize = Uttilties.getvideosize(getActivity(), uri1);
+                                String mb= Uttilties.FileSize(fileSize);
+                                //Toast.makeText(getActivity(), mb, Toast.LENGTH_LONG).show();
+                                Userref.child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (snapshot.exists()) {
+                                            long filesize = snapshot.child("size").getValue(long.class);
+                                            long total_size = filesize + fileSize;
+                                            //Toast.makeText(getContext(), String.valueOf(fileSize), Toast.LENGTH_SHORT).show();
+                                            Userref.child(user_id).child("size").setValue(total_size);
+                                            //name.setText((int) i);//snapshot.child("name").getValue().toString());
+                                            Bitmap bitmap = ImageResize.getThumbVideo(getContext(), uri1);
+                                            byte[] image = ImageResize.getBytesFromBitmap(bitmap);
+                                            String imgString = Base64.encodeToString(image, Base64.NO_WRAP);
+                                            String videoid = Uttilties.getRandomString(10);
+                                            VideoModel model = new VideoModel();
+                                            model.setId(videoid);
+                                            model.setThambnel(imgString);
+                                            model.setVideo(uri.toString());
+                                            Date c = Calendar.getInstance().getTime();
+                                            model.setData(c);
+                                            model.setVideo_Name(ImageResize.getFileName(getContext(), uri1));
+                                            databaseReference.child(user_id).child(videoid).setValue(model);
+                                            pd.dismiss();
+                                            //Toast.makeText(getActivity(), "file name is " + ImageResize.getFileName(getContext(), uri1), Toast.LENGTH_SHORT).show();
+                                            //startActivity(new Intent(getActivity(), MainActivity.class));
+                                        }
 
 
-                        }
-                    });
-                } else if (mimeType.startsWith("image")) {
+                                    }
 
-                    StorageReference riversRef = storageRef.child("image/" + uri1.getLastPathSegment());
-                    pd = new ProgressDialog(getActivity());
-                    pd.setCancelable(false);
-                    pd.show();
-                    uploadTask = riversRef.putFile(uri1);
-                    uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                            double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                            System.out.println("done");
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
 
-                            pd.setMessage(((int) progress) + "% uploaded");
-                            //pd.show();
+                                    }
+                                });
 
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            pd.dismiss();
-                        }
 
-                    }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                            riversRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri11) {
-                                    ImageModel model = new ImageModel();
-                                    //Bitmap bitmap;
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
 
-                                    //try {
-                                    //  Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri1);
-                                    // image = ImageResize.getBytesFromBitmap(bitmap);
-                                    // imgString = Base64.encodeToString(image, Base64.NO_WRAP);
-                                    //} catch (IOException e) {
-                                    //  e.printStackTrace();
-                                    //}
-                                    model.setImage(uri11.toString());
-                                    //model.setVideo_Name(uri.toString());
-                                    String videoid = Uttilties.getRandomString(10);
-                                    model.setId(videoid);
-                                    Date c = Calendar.getInstance().getTime();
-                                    model.setData(c);
-                                    model.setVideo_Name(ImageResize.getFileName(getContext(), uri1));
-                                    imagerefrance.child(user_id).child(videoid).setValue(model);
-                                    pd.dismiss();
-                                    Toast.makeText(getActivity(), "file name is " + ImageResize.getFileName(getContext(), uri1), Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(getActivity(), MainActivity.class));
-                                }
-                            });
-                        }
-                    });
+                            }
+                        });
 
-               /* }
-            }else if (data.getClipData() != null){
-                int countClipData = data.getClipData().getItemCount();
-                int currentImageSlect = 0;
-                Uri uri1 =data //data.getData();
-                String[] columns = {MediaStore.Images.Media.DATA,
-                        MediaStore.Images.Media.MIME_TYPE};
 
-                Cursor cursor = getActivity().getContentResolver().query(uri1, columns, null, null, null);
-                cursor.moveToFirst();
+                    }
+                });
 
-                int pathColumnIndex = cursor.getColumnIndex(columns[0]);
-                int mimeTypeColumnIndex = cursor.getColumnIndex(columns[1]);
 
-                String contentPath = cursor.getString(pathColumnIndex);
-                String mimeType = cursor.getString(mimeTypeColumnIndex);
-                cursor.close();
+            } else if (mimeType.startsWith("image")) {
 
-                while (currentImageSlect < countClipData) {
+                StorageReference riversRef = storageRef.child("image/" + uri1.getLastPathSegment());
+                pd = new ProgressDialog(getActivity());
+                pd.setCancelable(false);
+                pd.setTitle("Upload File");
+                pd.show();
+                uploadTask = riversRef.putFile(uri1);
+                uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                        System.out.println("done");
 
-                    ImageUri = data.getClipData().getItemAt(currentImageSlect).getUri();
-                    ImageList.add(ImageUri);
-                    currentImageSlect = currentImageSlect + 1;
-                    if (mimeType.startsWith("image")) {
-                        uplodeToFirebase("image");
-                    }else
-                        uplodeToFirebase("video");
-                }
+                        pd.setMessage(((int) progress) + "% Uploading...");
+                        //pd.show();
 
-                //alert.setVisibility(View.VISIBLE);
-                //alert.setText("You have selected" + ImageList.size() + "Images");
-                //chooserBtn.setVisibility(View.GONE);
-            */}
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        pd.dismiss();
+                    }
+
+                }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        riversRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri11) {
+                                long bitmap_size = Uttilties.getvideosize(getActivity(),uri1);
+                                String e= Uttilties.FileSize(bitmap_size);
+                                //Toast.makeText(getActivity(), e, Toast.LENGTH_LONG).show();
+                                Userref.child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (snapshot.exists()) {
+                                            long filesize = snapshot.child("size").getValue(long.class);
+                                            long total_size = filesize + bitmap_size;
+                                            Userref.child(user_id).child("size").setValue(total_size);
+                                            //Toast.makeText(getContext(), String.valueOf(bitmap_size), Toast.LENGTH_SHORT).show();
+                                            ImageModel model = new ImageModel();
+                                            model.setImage(uri11.toString());
+                                            //model.setVideo_Name(uri.toString());
+                                            String videoid = Uttilties.getRandomString(10);
+                                            model.setId(videoid);
+                                            Date c = Calendar.getInstance().getTime();
+                                            model.setData(c);
+                                            model.setVideo_Name(ImageResize.getFileName(getContext(), uri1));
+                                            imagerefrance.child(user_id).child(videoid).setValue(model);
+                                            pd.dismiss();
+                                            //Toast.makeText(getActivity(), "file name is " + ImageResize.getFileName(getContext(), uri1), Toast.LENGTH_SHORT).show();
+                                            //startActivity(new Intent(getActivity(), MainActivity.class));
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+                    }
+
+
+                });
+            }
+        }
+
 
         }
 
 
-    }
+
 
     private void uplodeToFirebase(String filetype) {
 

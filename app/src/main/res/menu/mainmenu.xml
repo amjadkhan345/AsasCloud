@@ -11,7 +11,10 @@
 
 
     <item android:id="@+id/countect_us"
-        android:title="Contact Us"/>
+        android:title="privacy policy"/>
+
+    <item android:id="@+id/invite"
+        android:title="Invite Friend"/>
 
     <item android:id="@+id/reate_us"
         android:title="Logout" />

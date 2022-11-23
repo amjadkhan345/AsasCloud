@@ -3,6 +3,13 @@ package com.asas.cloud.Model;
 public class UserModel {
     String Name, Email, Age, Country, PhoneNumber,Profileurl;
 
+    long size, user_storage;
+
+    public UserModel(long size, long user_storage) {
+        this.size = size;
+        this.user_storage = user_storage;
+    }
+
     public UserModel() {
     }
 
@@ -13,6 +20,23 @@ public class UserModel {
         Country = country;
         PhoneNumber = phoneNumber;
         Profileurl = profileurl;
+    }
+
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public long getUser_storage() {
+        return user_storage;
+    }
+
+    public void setUser_storage(long user_storage) {
+        this.user_storage = user_storage;
     }
 
     public String getProfileurl() {

@@ -1,11 +1,10 @@
 package com.asas.cloud.Model;
 
-import android.provider.ContactsContract;
-
 import java.util.Date;
 
 public class ImageModel {
     String   Video_Name, Id, Image;
+
     Date Data;
     //byte[] Image;
 

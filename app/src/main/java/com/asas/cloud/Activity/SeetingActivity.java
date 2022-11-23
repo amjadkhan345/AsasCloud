@@ -15,8 +15,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
 
 import com.asas.cloud.R;
+
+import java.util.concurrent.Executor;
 
 public class SeetingActivity extends AppCompatActivity {
 
@@ -25,6 +29,7 @@ public class SeetingActivity extends AppCompatActivity {
     LinearLayout layout1, layout2, layout3, layout_none;
     TextView msgtex1;
     Switch aSwitch;
+    BiometricPrompt.PromptInfo promptInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +91,8 @@ public class SeetingActivity extends AppCompatActivity {
                     editor.putString("lockd_no", "10");
                     editor.putBoolean("lockd", false);
                     editor.apply();
-                    startActivity(new Intent(SeetingActivity.this, MainActivity.class));
-                    finish();
+                    //startActivity(new Intent(SeetingActivity.this, MainActivity.class));
+                    //finish();
 
 
                     // do something else
@@ -147,42 +152,78 @@ public class SeetingActivity extends AppCompatActivity {
     }
 
     private void onFinger() {
-        BiometricManager biometricManager = androidx.biometric.BiometricManager.from(SeetingActivity.this);
+        //biometricPrompt.authenticate(promptInfo);
+        promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Asas cloud")
+                .setDescription("Use your fingerprint to login ").setNegativeButtonText("Cancel").build();
+
+
+        // creating a variable for our BiometricManager
+        // and lets check if our user can use biometric sensor or not
+        BiometricManager biometricManager = androidx.biometric.BiometricManager.from(this);
         switch (biometricManager.canAuthenticate()) {
 
             // this means we can use biometric sensor
             case BiometricManager.BIOMETRIC_SUCCESS:
-                //msgtex1.setText("You can use the fingerprint sensor to login");
-                //msgtex1.setTextColor(Color.parseColor("#fafafa"));
-                SharedPreferences sharedPref = SeetingActivity.this.getSharedPreferences("myapplication", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("lockd_no", "3");
-                editor.putBoolean("lockd", true);
-                editor.apply();
-                Toast.makeText(SeetingActivity.this, "Success", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(SeetingActivity.this, MainActivity.class));
-                finish();
+                //Toast.makeText(this, "You can use the fingerprint sensor to login", Toast.LENGTH_SHORT).show();
+                //msgtex.setText("You can use the fingerprint sensor to login");
+                //msgtex.setTextColor(Color.parseColor("#fafafa"));
                 break;
 
             // this means that the device doesn't have fingerprint sensor
             case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
-                msgtex1.setText("This device doesnot have a fingerprint sensor");
+                Toast.makeText(this, "This device doesnot have a fingerprint sensor", Toast.LENGTH_SHORT).show();
+                //msgtex.setText("This device doesnot have a fingerprint sensor");
                 //loginbutton.setVisibility(View.GONE);
                 break;
 
             // this means that biometric sensor is not available
             case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
-                msgtex1.setText("The biometric sensor is currently unavailable");
+                Toast.makeText(this, "The biometric sensor is currently unavailable", Toast.LENGTH_SHORT).show();
+                //msgtex.setText("The biometric sensor is currently unavailable");
                 //loginbutton.setVisibility(View.GONE);
                 break;
 
             // this means that the device doesn't contain your fingerprint
             case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
-                msgtex1.setText("Your device doesn't have fingerprint saved,please check your security settings");
+                Toast.makeText(this, "Your device doesn't have fingerprint saved,please check your security settings", Toast.LENGTH_SHORT).show();
+                //msgtex.setText("Your device doesn't have fingerprint saved,please check your security settings");
                 //loginbutton.setVisibility(View.GONE);
                 break;
+        }
+        // creating a variable for our Executor
+        Executor executor = ContextCompat.getMainExecutor(this);
+        // this will give us result of AUTHENTICATION
+        final BiometricPrompt biometricPrompt = new BiometricPrompt(SeetingActivity.this, executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                aSwitch.setChecked(false);
+            }
 
-    }
+            // THIS METHOD IS CALLED WHEN AUTHENTICATION IS SUCCESS
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                Toast.makeText(getApplicationContext(), "Login Success", Toast.LENGTH_SHORT).show();
+                SharedPreferences sharedPref = SeetingActivity.this.getSharedPreferences("myapplication", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("lockd_no", "3");
+                editor.putBoolean("lockd", true);
+                editor.apply();
+                aSwitch.setChecked(true);
+                //loginbutton.setText("Login Successful");
+
+                //startActivity(new Intent(SeetingActivity.this, LoginActivity.class));
+                //finish();
+            }
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+            }
+        });
+        biometricPrompt.authenticate(promptInfo);
+
+
 
 
     }

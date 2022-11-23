@@ -112,12 +112,25 @@
         android:id="@+id/profile_image1"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="80dp"
         android:src="@drawable/ic_user_circle_24"
         app:civ_border_color="#FF000000"
         app:civ_border_width="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/file_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0 Mb/20 GB"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/profile_image1"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

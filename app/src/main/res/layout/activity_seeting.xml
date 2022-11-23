@@ -10,7 +10,8 @@
         android:id="@+id/linearLayout"
 
         android:layout_width="match_parent"
-        android:gravity="center"
+
+
 
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -23,6 +24,7 @@
 
         <TextView
             android:textColor="@color/black"
+            android:layout_marginStart="10dp"
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,8 +36,10 @@
     <LinearLayout
         android:id="@+id/none"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="5dp"
+        android:layout_marginTop="0dp"
+        android:padding="10dp"
         android:layout_marginStart="10dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
         app:layout_constraintEnd_toEndOf="parent"
@@ -55,7 +59,7 @@
             android:layout_height="wrap_content"
             android:text="None"
             android:textColor="@color/black"
-            android:textStyle="bold"
+
 
             android:textSize="20sp"/>
 
@@ -66,9 +70,10 @@
     <LinearLayout
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
         android:layout_marginEnd="5dp"
+        android:padding="10dp"
         android:layout_marginStart="10dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -79,7 +84,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_fingerprint_24"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="8dp"/>
 
 
@@ -93,7 +98,7 @@
             android:text="Fingerprint"
 
             android:textSize="20sp"
-            android:textStyle="bold" />
+             />
 
 
     </LinearLayout>
@@ -101,10 +106,11 @@
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
         android:layout_marginEnd="5dp"
         android:layout_marginStart="10dp"
+        android:padding="10dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -121,7 +127,7 @@
 
         <TextView
             android:textColor="@color/black"
-            android:textStyle="bold"
+
             android:layout_margin="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -137,9 +143,10 @@
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
         android:layout_marginEnd="5dp"
+        android:padding="10dp"
         android:layout_marginStart="10dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -156,7 +163,7 @@
 
         <TextView
             android:textColor="@color/black"
-            android:textStyle="bold"
+
             android:layout_margin="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

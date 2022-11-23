@@ -136,13 +136,13 @@ public class CreateUserActivity extends AppCompatActivity {
                                         model.setEmail(bundle.getString("email"));
                                         model.setName(bundle.getString("name"));
                                         model.setPhoneNumber(phone1);
+                                        model.setUser_storage(20000000);
+                                        model.setSize(0);
                                         reference.child(bundle.getString("user_id")).setValue(model);
                                         Intent intent = new Intent(CreateUserActivity.this, MainActivity.class);
                                         startActivity(intent);
                                         finish();
                                         pd.dismiss();
-
-
                                     }
                                 });
 

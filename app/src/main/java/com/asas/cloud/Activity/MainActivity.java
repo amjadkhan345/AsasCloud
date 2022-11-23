@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             //getActivity().finish();
 
         } else if (item_id == R.id.countect_us) {
-            Intent intent = new Intent(MainActivity.this, CountactActivity.class);
+            Intent intent = new Intent(MainActivity.this, PravicyActivity.class);
             startActivity(intent);
             //finishAffinity();
             //getActivity().finish();
@@ -130,6 +131,10 @@ public class MainActivity extends AppCompatActivity {
             //}else if(item_id==R.id.purches){
           //  startActivity(new Intent(MainActivity.this, ProductActivity.class));
 
+        }else if(item_id== R.id.invite){
+            final String appPackageName = getPackageName();//"com."; // your application package name
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
         }
         else {
             //Intent intent = new Intent(this, PlayStoreActivity.class);
