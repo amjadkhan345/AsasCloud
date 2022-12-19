@@ -1,28 +1,31 @@
 package com.asas.cloud.fragment;
 
+import static android.app.Activity.RESULT_OK;
+import static android.content.ContentValues.TAG;
+import static com.facebook.FacebookSdk.getApplicationContext;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentContainerView;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.asas.cloud.Activity.MainActivity;
 import com.asas.cloud.Model.FileModel;
 import com.asas.cloud.R;
 import com.asas.cloud.adapter.FileAdapter;
+import com.asas.cloud.adapter.FileMain;
 import com.asas.cloud.classes.ImageResize;
 import com.asas.cloud.classes.References;
 import com.asas.cloud.classes.Uttilties;
@@ -43,12 +46,10 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
-import static android.app.Activity.RESULT_OK;
-import static android.content.ContentValues.TAG;
+import java.util.List;
 
 
 public class FileFragment extends Fragment {
@@ -73,6 +74,9 @@ public class FileFragment extends Fragment {
     String user_id, username, userprofile,user_uuid;
     //RecyclerView recyclerView;
     ////FirebaseDatabase database;
+    List<FileModel> list;
+    boolean ads;
+    FileMain mainVideo;
 
 
 
@@ -84,6 +88,7 @@ public class FileFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_file, container, false);
         button = view.findViewById(R.id.plus_file);
+        button.setVisibility(View.GONE);
         recyclerView = view.findViewById(R.id.file_recycler_view);
 
         auth = FirebaseAuth.getInstance();
@@ -95,16 +100,64 @@ public class FileFragment extends Fragment {
                 .setQuery(databaseReference.child(user_id), FileModel.class)
                 .build();
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),2);
-        recyclerView.setLayoutManager( new GridLayoutManager(getContext(),3, LinearLayoutManager.VERTICAL,false));
-        //gridLayoutManager.setReverseLayout(true);
-        recyclerView.setItemAnimator(null);
+        References.ADS_Reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String ads1= snapshot.child("ads").getValue().toString();
+                if (ads1.equals("true")){
+                    ads=true;
+                }else{
+                    ads=false;
+                }
 
-        //recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         adapter = new FileAdapter(options);
-        //adapter.notifyDataSetChanged();
-        //adapter.setClickListener(this);
-        recyclerView.setAdapter(adapter);
+        list = new ArrayList<>();
+        list.clear();
+        // = new FileMain()
+        mainVideo = new FileMain(getActivity(), list);
+
+        References.File_Reference.child(user_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for(DataSnapshot ds: snapshot.getChildren()){
+
+                    FileModel model = ds.getValue(FileModel.class);
+                    //list = new ArrayList<>();
+                    //list.clear();
+                    list.add(model);
+                    mainVideo.notifyDataSetChanged();
+                    //Toast.makeText(getContext(), list.get(0).getVideo_Name(), Toast.LENGTH_SHORT).show();
+
+                }
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        //recyclerView.setLayoutManager( new GridLayoutManager(getContext(),4, LinearLayoutManager.VERTICAL,false));
+        //gridLayoutManager.setReverseLayout(true);
+        //recyclerView.setLayoutManager(LinearLayoutManager.HORIZONTAL);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        //recyclerView.setItemAnimator(null);
+        recyclerView.setLayoutManager(mLayoutManager);
+        if(ads==true) {
+            recyclerView.setAdapter(mainVideo);
+        }else{
+            recyclerView.setAdapter(adapter);
+        }
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override

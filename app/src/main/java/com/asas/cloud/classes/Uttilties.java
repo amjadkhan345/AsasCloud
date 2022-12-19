@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.webkit.MimeTypeMap;
 
 import java.io.ByteArrayOutputStream;
@@ -58,6 +59,17 @@ public class Uttilties {
         long fileSize = file1 / 1024;
         return fileSize;
     }
+    public static  Long getfilesize(Context context, Uri uri) {
+        Cursor returnCursor = context.getContentResolver().
+                query(uri, null, null, null, null);
+        int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+        returnCursor.moveToFirst();
+
+        long size = returnCursor.getLong(sizeIndex) / 1000;
+        returnCursor.close();
+
+        return size ;
+    }
 
 
     public static String FileSize(long size) {
@@ -90,7 +102,7 @@ public class Uttilties {
         String[] projection = { MediaStore.Images.Media.DATA };
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
         if (cursor == null) return null;
-        int column_index =             cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         String s=cursor.getString(column_index);
         cursor.close();
@@ -114,20 +126,34 @@ public class Uttilties {
         return output ;
     }
 
-    public static void downloadManager(Context context, String url) {
+    public static void downloadManager(Context context, String url, String name) {
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         request.setDescription("download");
-        request.setTitle(""+getRandomString(6)+".mp4");
+        request.setTitle(name);
 // in order for this if to run, you must use the android 3.2 to compile your app
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         }
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, ""+getRandomString(6)+".mp4");
+        request.setDestinationInExternalPublicDir(createfolder(), name);
 
 // get download service and enqueue file
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);
+    }
+    public static String createfolder(){
+        String foldername = null;
+        File dir = new File(Environment.getExternalStorageDirectory() + "Asascloud");
+        if(dir.exists() && dir.isDirectory()) {
+            foldername=dir.getPath();
+            // do something here
+        }else{
+            File dire= new File(dir.getPath());
+            dire.mkdirs();
+            foldername=dir.getPath();
+
+        }
+        return foldername;
     }
     public static void downloadImageManager(Context context, String url) {
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));

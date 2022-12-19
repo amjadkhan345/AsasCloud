@@ -20,10 +20,13 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+
         auth = FirebaseAuth.getInstance();
         user=auth.getCurrentUser();
+
         SharedPreferences sharedPref = this.getSharedPreferences("myapplication", Context.MODE_PRIVATE);
         name = sharedPref.getString("lockd_no", "");
 

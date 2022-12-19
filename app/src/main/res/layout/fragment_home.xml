@@ -8,11 +8,10 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_below="@+id/search_view"
-
-
         android:id="@+id/video_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/margin5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -61,7 +62,15 @@ public class ProfileActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
         progressDialog.setTitle("Load Data");
         progressDialog.show();
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        size_view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(ProfileActivity.this, ProductActivity.class);
+                startActivity(intent);
+            }
+        });
         reference.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -73,12 +82,18 @@ public class ProfileActivity extends AppCompatActivity {
                     if(snapshot.exists()) {
                         progressDialog.dismiss();
                         name.setText(snapshot.child("name").getValue().toString());
-                        email.setText(snapshot.child("email").getValue().toString());
+                        if(snapshot.child("email").exists()) {
+                            email.setText(snapshot.child("email").getValue().toString());
+                        }else{
+                            email.setText("your email is not exist");
+                        }
                         contry.setText(snapshot.child("country").getValue().toString());
                         number.setText(snapshot.child("phoneNumber").getValue().toString());
-                        Glide.with(ProfileActivity.this).load(snapshot.child("profileurl").getValue().toString()).into(profile_image);
+                        Glide.with(getApplicationContext()).load(snapshot.child("profileurl").getValue().toString()).into(profile_image);
                         String size=snapshot.child("size").getValue().toString();
                         long kb= Long.parseLong(size);
+                        //contry.setVisibility(View.GONE);
+                        //number.setVisibility(View.GONE);
                         String filesize = Uttilties.FileSize(kb);
                         String user_storage= snapshot.child("user_storage").getValue().toString();
                         long user_stoarge=Long.parseLong(user_storage);

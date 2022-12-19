@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Asas Cloud</string>
+    <string name="app_name">Asascloud</string>
     <string name="privacy_policy" translatable="false">i agree to privacy policy</string>
-    <string name="google_id" translatable="false">768343075532-jm2k3eqk0alr4cda7vdkimrtde9hshr0.apps.googleusercontent.com</string>
+    <string name="google_id" translatable="false">889383323843-q2qofd16i28eji7llsd8r0b5voi90j7p.apps.googleusercontent.com</string>
     <string name="title_activity_splish" translatable="false">FullscreenActivity</string>
     <string name="dummy_button" translatable="false">Dummy Button</string>
     <string name="dummy_content" translatable="false">DUMMY\nCONTENT</string>
@@ -12,9 +12,15 @@
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="track_selection_title" translatable="false">Video Quality</string>
     <string name="feild_reqird" translatable="false">Field reqird</string>
-    <string name="reqird_crekter" translatable="false">itlest 4 crekter is reqird</string>
-    <string name="play_console_license" translatable="false">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhOnG4+VFuerG1w7Tfzhpsixd4S+R3chJxNWhDd2QFV6XRCgc0cZB07DXrD8b9sbW1eC0XMGZL/iHTIv1FWv+b9p7nHF2mWtzzCh/5n88Ae49g18jlMdCh/1H7bcL4qdea/BEwoPEvmcnGltihWugdKNOdzJ1XgxLoFdOaJ4qg617ZNH6qPgJak1J0UfKw8SAD0cooJNt0q1j4B+VWlY3sV2ZFf7thVaSOLGZ8cz2b55tXAU5XKXYqfg9+SC5PVlDM7gCbhbwT4BpDcuRnuQXkxude7MoONEMRgYOUqCz1eVdY3D6EPd+cP4Ff4rHOOirnX3EsF4Z5rt/qXh+AsLOfQIDAQAB</string>
+    <string name="reqird_crekter" translatable="false">4 character is required</string>
+    <string name="play_console_license" translatable="false">+VFuerG1w7Tfzhpsixd4S+R3chJxNWhDd2QFV6XRCgc0cZB07DXrD8b9sbW1eC0XMGZL/iHTIv1FWv+b9p7nHF2mWtzzCh/5n88Ae49g18jlMdCh/1H7bcL4qdea/BEwoPEvmcnGltihWugdKNOdzJ1XgxLoFdOaJ4qg617ZNH6qPgJak1J0UfKw8SAD0cooJNt0q1j4B+VWlY3sV2ZFf7thVaSOLGZ8cz2b55tXAU5XKXYqfg9+SC5PVlDM7gCbhbwT4BpDcuRnuQXkxude7MoONEMRgYOUqCz1eVdY3D6EPd+cP4Ff4rHOOirnX3EsF4Z5rt/qXh+AsLOfQIDAQAB</string>
     <string name="premium1" translatable="false">asas1</string>
     <string name="premium2" translatable="false">asas2</string>
     <string name="premium3" translatable="false">asas3</string>
+    <string name="ad_attribution">AD</string>
+    <string name="upgrade_plan_to">Upgrade plan to</string>
+    <string name="licince_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiCQauBmN2yQUxhQ9gBJytD4rCZ5VrjKbfglwfEV/7iizgIFdRWM62dWDZku30v9AGkBUoeQpz9IzWZepJoBC5cNs7Fj0tFL9u/8JcNXOV3naTUDDrk2HociB9NTNQGh31KuHU40kgznFWkeYOrpDpxIHxmgW9psiedcKJ/WOxCeO77yHB4pGHoIu54XLAoqwP5iyDz04ugeD/7DNemDN/2vCHm/7BHdcZ+aJHqDb0KecydRHHdo677uKmefxyxqbW7Y7cIidp61oB4ashkpIWoT1pyBw8EUc7EsGQGUxQWL7OYlcwBn/A15LqEAgDsHNSQIl4I4hbHPfFvc206vjJwIDAQAB</string>
+    <string name="highly_experience">Highly Experience</string>
+    <string name="enter_amount">Enter custom amount...</string>
+    <string name="add_to_wallet">Add to wallet</string>
 </resources>

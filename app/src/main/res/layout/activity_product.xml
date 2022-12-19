@@ -4,38 +4,69 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="@dimen/margin10"
+    android:background="#B0BEF1"
     tools:context=".Activity.ProductActivity">
 
-    <TextView
-        android:id="@+id/p_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:text="Purchese for 1 year 50$"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/p_2" />
 
     <TextView
-        android:id="@+id/p_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
-        android:text="Purchese for 6 mounth 25$"
+        android:id="@+id/a10"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="@dimen/margin20"
+        android:layout_marginTop="132dp"
+        android:background="@drawable/btn_bg"
+        android:padding="@dimen/margin10"
+        android:textColor="@color/black"
+        android:text="10 GB Space : 10$"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/p_1" />
-
-    <TextView
-        android:id="@+id/p_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="68dp"
-        android:text="Purchese for 1 mounth 5$"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/a30"
+        android:layout_margin="@dimen/margin20"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:padding="@dimen/margin10"
+        android:background="@drawable/btn_bg"
+        android:text="30 GB Space : 20$"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/a10" />
+
+    <TextView
+        android:id="@+id/a50"
+        android:layout_margin="@dimen/margin20"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textAlignment="center"
+        android:padding="@dimen/margin10"
+        android:background="@drawable/btn_bg"
+        android:text="50 GB Space : 40$"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/a100" />
+
+    <TextView
+        android:id="@+id/a100"
+        android:layout_margin="@dimen/margin20"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textAlignment="center"
+        android:padding="@dimen/margin10"
+        android:background="@drawable/btn_bg"
+        android:text="100 GB Space : 75$"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/a30" />
 </androidx.constraintlayout.widget.ConstraintLayout>

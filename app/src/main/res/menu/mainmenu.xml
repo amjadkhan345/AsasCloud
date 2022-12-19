@@ -6,15 +6,16 @@
         android:title="Profile"/>
 
     <item android:id="@+id/seating"
-        android:title="Seating"
-        android:icon="@drawable/ic_settings"/>
+        android:title="Settings"
+        android:icon="@drawable/ic_settings"
+        />
 
 
     <item android:id="@+id/countect_us"
         android:title="privacy policy"/>
 
     <item android:id="@+id/invite"
-        android:title="Invite Friend"/>
+        android:title="Invite Friends"/>
 
     <item android:id="@+id/reate_us"
         android:title="Logout" />

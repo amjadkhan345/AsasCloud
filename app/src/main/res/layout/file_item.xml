@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardUseCompatPadding="true"
+    android:layout_margin="@dimen/margin3"
+    android:id="@+id/l_view"
+    app:cardCornerRadius="4dp">
+
+    <LinearLayout
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/exoplayerview"
+            android:layout_margin="3dp"
+            android:src="@drawable/pdf"
+            app:use_controller="true"
+            app:resize_mode="fill"/>
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+
+            android:text="Video Title"
+            android:textColor="#000"
+            android:id="@+id/vtitle"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,8 +1,6 @@
 package com.asas.cloud.Activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -17,9 +15,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-//import android.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.asas.cloud.Model.AudioModel;
 import com.asas.cloud.Model.VideoModel;
 import com.asas.cloud.R;
 import com.asas.cloud.classes.References;
@@ -33,6 +35,8 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -40,12 +44,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
 //import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 //import com.google.android.exoplayer2.ui.PlayerView;
 
 
 public class PlayVideoActivity extends AppCompatActivity {
     ImageView speedBtn, farwordBtn, rewBtn, setting;
+    ArrayList<VideoModel> list;//= new ArrayList<>();
 
     private boolean isShowingTrackSelectionDialog;
     private DefaultTrackSelector trackSelector;
@@ -60,15 +69,20 @@ public class PlayVideoActivity extends AppCompatActivity {
     DatabaseReference databaseReference;
     FirebaseAuth auth;
     FirebaseUser user;
-    String user_id, id;
+    String user_id, id, type, videoname, audioname;
+    int position;
+    VideoModel model;
+    AudioModel audioModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_video);
-
+        list=new ArrayList<>();
+        type=getIntent().getStringExtra("type");
         id = getIntent().getStringExtra("id");
         url1 = getIntent().getStringExtra("url");
+        //position= getIntent().getIntExtra("position", 1);
 
 
         toolbar = findViewById(R.id.toolbar55);
@@ -85,14 +99,51 @@ public class PlayVideoActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         user_id = user.getUid();
+        databaseReference.child(user_id).child(id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    videoname= snapshot.child("video_Name").getValue().toString();
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        References.AUDIO_Reference.child(user_id).child(id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    audioname = snapshot.child("video_Name").getValue().toString();
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
         Log.d("user", user_id);
         //R85ykKRgWoU69dBXAsYXm1N2rfU2
+        //int postion = list.size();
+        list.add(model);
+        //String path = list.get(position).getVideo();
+        //Uri uri=Uri.parse(path);
 
 
         trackSelector = new DefaultTrackSelector(PlayVideoActivity.this);
         simpleExoPlayer = new SimpleExoPlayer.Builder(PlayVideoActivity.this).setTrackSelector(trackSelector).build();
         playerView = findViewById(R.id.exoPlayerView);
         playerView.setPlayer(simpleExoPlayer);
+
         MediaItem mediaItem = MediaItem.fromUri(url1);
         simpleExoPlayer.addMediaItem(mediaItem);
         simpleExoPlayer.prepare();
@@ -287,18 +338,44 @@ public class PlayVideoActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int item_id = item.getItemId();
         if (item_id == R.id.download) {
-            Uttilties.downloadManager(this, url1);
-            Toast.makeText(this, "Download start....", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(PlayVideoActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+            if(type.equals("video")) {
+                Uttilties.downloadManager(this, url1, videoname);
+                Toast.makeText(this, "Download start....", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(PlayVideoActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }else if (type.equals("audio")){
+                Uttilties.downloadManager(this, url1, audioname);
+                Toast.makeText(this, "Download start....", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(PlayVideoActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+
+            }
 
 
         } else if (item_id == R.id.delete) {
-            databaseReference.child(user_id).child(id).setValue(null);
-            Intent intent = new Intent(PlayVideoActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+            FirebaseStorage storage=FirebaseStorage.getInstance();
+            StorageReference photoRef = storage.getReferenceFromUrl(url1);
+
+            photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
+                    databaseReference.child(user_id).child(id).setValue(null);
+                    Intent intent = new Intent(PlayVideoActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                    Log.d(TAG, "onSuccess: deleted file");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Log.d(TAG, "onFailure: did not delete file");
+                }
+            });
+
 
         } else {
             finish();

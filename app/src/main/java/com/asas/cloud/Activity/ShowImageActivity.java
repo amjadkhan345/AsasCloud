@@ -1,28 +1,27 @@
 package com.asas.cloud.Activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.asas.cloud.R;
-import com.asas.cloud.classes.ImageResize;
 import com.asas.cloud.classes.References;
 import com.asas.cloud.classes.Uttilties;
 import com.bumptech.glide.Glide;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ShowImageActivity extends AppCompatActivity {
     ImageView imageView;
@@ -32,6 +31,7 @@ public class ShowImageActivity extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseUser user;
     String user_id, id, url1;
+    String model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +58,20 @@ public class ShowImageActivity extends AppCompatActivity {
         user_id = user.getUid();
         //String file_id = getIntent().getStringExtra("id");
         Glide.with(this).load(url1).into(imageView);
+        databaseReference.child(user_id).child(id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    model= snapshot.child("video_Name").getValue().toString();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
 
 
@@ -75,7 +89,8 @@ public class ShowImageActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int item_id = item.getItemId();
         if (item_id == R.id.download) {
-            Uttilties.downloadImageManager(this, url1);
+            //Uttilties.downloadImageManager(this, url1, model.getVideo_Name());
+            Uttilties.downloadManager(ShowImageActivity.this, url1, model);
             Toast.makeText(this, "Download start....", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(ShowImageActivity.this, MainActivity.class);
             startActivity(intent);

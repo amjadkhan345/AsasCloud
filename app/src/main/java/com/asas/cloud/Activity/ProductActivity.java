@@ -1,151 +1,183 @@
 package com.asas.cloud.Activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MutableLiveData;
 
-import com.anjlab.android.iab.v3.BillingProcessor;
-import com.anjlab.android.iab.v3.TransactionDetails;
+import com.aemerse.iap.DataWrappers;
+import com.aemerse.iap.IapConnector;
+import com.aemerse.iap.PurchaseServiceListener;
+import com.aemerse.iap.SubscriptionServiceListener;
 import com.asas.cloud.R;
+import com.asas.cloud.classes.References;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.annotations.NotNull;
 
-public class ProductActivity extends AppCompatActivity implements BillingProcessor.IBillingHandler {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-    TextView p1,p2,p3;
-    private BillingProcessor bp;
-    //private TextView tvStatus;
-    //private Button btnPremium;
-    private TransactionDetails purchaseTransactionDetails = null;
+import games.moisoni.google_iab.BillingConnector;
+
+public class ProductActivity extends AppCompatActivity {
+    private BillingConnector billingConnector;
+    MutableLiveData<Boolean> isBillingClientConnected = new MutableLiveData<>();
+
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    FirebaseUser user= auth.getCurrentUser();
+
+    String user_id, size;
+
+    TextView a10, a30, a50, a100;
+
+    //create a list with consumable ids
+    private final List<String> consumableIds = new ArrayList<>();
+    private final ArrayList<String> purchaseItemDisplay = new ArrayList<>();
+    private ArrayAdapter arrayAdapter;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
+        user_id= user.getUid();
+        a10= findViewById(R.id.a10);
+        a30= findViewById(R.id.a30);
+        a50= findViewById(R.id.a50);
+        a100= findViewById(R.id.a100);
+        References.User_Reference.child(user_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-        p1=findViewById(R.id.p_1);
-        p2=findViewById(R.id.p_2);
-        p3=findViewById(R.id.p_3);
+                if (snapshot.exists()){
+                    size = snapshot.child("user_storage").getValue().toString();
+                }
 
-        bp = new BillingProcessor(this, getResources().getString(R.string.play_console_license), this);
-        bp.initialize();
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-    }
+            }
+        });
+        isBillingClientConnected.setValue(false);
 
-    private boolean hasSubscription() {
-        if (purchaseTransactionDetails != null) {
-            return purchaseTransactionDetails.purchaseInfo != null;
-        }
-        return false;
-    }
+        List<String> nonConsumablesList = Collections.singletonList("subscription");//Arrays.asList("10_gb_space", "30_gb_space", "50_gb_space", "100_gb_space");
+        List<String> consumablesList = Arrays.asList("10_gb_space", "30_gb_space", "50_gb_space", "100_gb_space");
+        //Collections.singletonList("subscription");
+        List<String> subsList = Collections.singletonList("subscription");
 
-    @Override
-    public void onBillingInitialized() {
+        IapConnector iapConnector = new IapConnector(
+                this,
+                nonConsumablesList,
+                consumablesList,
+                subsList,
+                getResources().getString(R.string.licince_key),
+                true
+        );
+        iapConnector.addBillingClientConnectionListener((status, billingResponseCode) -> {
+            Log.d("KSA", "This is the status: "+status+" and response code is: "+billingResponseCode);
+            isBillingClientConnected.setValue(status);
+        });
+        iapConnector.addPurchaseListener(new PurchaseServiceListener() {
+            public void onPricesUpdated(@NotNull Map iapKeyPrices) {
 
-        Log.d("MainActivity", "onBillingInitialized: ");
+            }
+            public void onProductPurchased(@NonNull DataWrappers.PurchaseInfo purchaseInfo) {
+                if (purchaseInfo.getSku().equals("10_gb_space")) {
 
+                    long user_stoarge=Long.parseLong(size);
+                    long purcheasegb = 10000000;
+                    long totel = user_stoarge + purcheasegb;
+                    References.User_Reference.child(user_id).child("user_storage").setValue(totel);
+                    Toast.makeText(getApplicationContext(), "Thanks For purchase 10 GB space", Toast.LENGTH_SHORT).show();
 
+                }else if (purchaseInfo.getSku().equals("30_gb_space")) {
+                    long user_stoarge=Long.parseLong(size);
+                    long purcheasegb = 30000000;
+                    long totel = user_stoarge + purcheasegb;
+                    References.User_Reference.child(user_id).child("user_storage").setValue(totel);
+                    Toast.makeText(getApplicationContext(), "Thanks For purchase 30 GB space", Toast.LENGTH_SHORT).show();
 
-        //1
-        String premium1 = getResources().getString(R.string.premium1);
-        purchaseTransactionDetails = bp.getSubscriptionTransactionDetails(premium1);
+                } else if (purchaseInfo.getSku().equals("50_gb_space")) {
+                    long user_stoarge=Long.parseLong(size);
+                    long purcheasegb = 50000000;
+                    long totel = user_stoarge + purcheasegb;
+                    References.User_Reference.child(user_id).child("user_storage").setValue(totel);
+                    Toast.makeText(getApplicationContext(), "Thanks For purchase 50 GB space", Toast.LENGTH_SHORT).show();
 
+                }else if (purchaseInfo.getSku().equals("100_gb_space")) {
+                    long user_stoarge=Long.parseLong(size);
+                    long purcheasegb = 100000000;
+                    long totel = user_stoarge + purcheasegb;
+                    References.User_Reference.child(user_id).child("user_storage").setValue(totel);
+                    Toast.makeText(getApplicationContext(), "Thanks For purchase 100 GB space", Toast.LENGTH_SHORT).show();
 
-        //2
-        String premium2 = getResources().getString(R.string.premium1);
-        purchaseTransactionDetails = bp.getSubscriptionTransactionDetails(premium2);
-        //3
-        String premium3 = getResources().getString(R.string.premium1);
-        purchaseTransactionDetails = bp.getSubscriptionTransactionDetails(premium3);
+                }
+            }
 
-        bp.loadOwnedPurchasesFromGoogle();
+            public void onProductRestored(@NonNull DataWrappers.PurchaseInfo purchaseInfo) {
 
-        p1.setOnClickListener(v -> {
-            if (bp.isSubscriptionUpdateSupported()) {
-                bp.subscribe(this, premium1);
-            } else {
-                Log.d("MainActivity", "onBillingInitialized: Subscription updated is not supported");
+            }
+        });
+
+        iapConnector.addSubscriptionListener(new SubscriptionServiceListener() {
+            public void onSubscriptionRestored(@NonNull DataWrappers.PurchaseInfo purchaseInfo) {
+            }
+
+            public void onSubscriptionPurchased(@NonNull DataWrappers.PurchaseInfo purchaseInfo) {
+                if (purchaseInfo.getSku().equals("subscription")) {
+
+                }
+            }
+
+            public void onPricesUpdated(@NotNull Map iapKeyPrices) {
+
+            }
+        });
+        a10.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                iapConnector.purchase(ProductActivity.this, "10_gb_space");
+                //startActivity(new Intent(ProductActivity.this, ProductActivity.class));
+            }
+        });
+        a30.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                iapConnector.purchase(ProductActivity.this, "30_gb_space");
+            }
+        });
+        a50.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                iapConnector.purchase(ProductActivity.this, "50_gb_space");
+            }
+        });
+        a100.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                iapConnector.purchase(ProductActivity.this, "100_gb_space");
             }
         });
 
 
-        p2.setOnClickListener(v -> {
-            if (bp.isSubscriptionUpdateSupported()) {
-                bp.subscribe(this, premium2);
-            } else {
-                Log.d("MainActivity", "onBillingInitialized: Subscription updated is not supported");
-            }
-        });
-
-
-        p3.setOnClickListener(v -> {
-            if (bp.isSubscriptionUpdateSupported()) {
-                bp.subscribe(this, premium3);
-            } else {
-                Log.d("MainActivity", "onBillingInitialized: Subscription updated is not supported");
-            }
-        });
-
-        if (hasSubscription()) {
-            String productId= purchaseTransactionDetails.purchaseInfo.purchaseData.productId.toString();
-            if (productId.equals(premium1)){
-                Toast.makeText(this, "you subscribe for one mounth,  Your product id is " + productId, Toast.LENGTH_SHORT).show();
-            }else if(productId.equals(premium2)){
-                Toast.makeText(this, "you subscribe for six mounth,  Your product id is " + productId, Toast.LENGTH_SHORT).show();
-
-
-            }else if(productId.equals(premium3)){
-                Toast.makeText(this, "you subscribe for one year,  Your product id is " + productId, Toast.LENGTH_SHORT).show();
-
-            }
-            else{
-                Toast.makeText(this, "you in free version", Toast.LENGTH_SHORT).show();
-            }
-            //tvStatus.setText("Status: Premium");
-        } else {
-            //tvStatus.setText("Status: Free");
-        }
-    }
-
-
-
-    //@Override
-    //public void onProductPurchased(@NonNull String productId, @Nullable PurchaseInfo details) {
-
-    //}
-    @Override
-    public void onProductPurchased(String productId, TransactionDetails details) {
-        Log.d("MainActivity", "onProductPurchased: ");
-    }
-
-    @Override
-    public void onPurchaseHistoryRestored() {
-        Log.d("MainActivity", "onPurchaseHistoryRestored: ");
 
     }
 
-    @Override
-    public void onBillingError(int errorCode, Throwable error) {
-        Log.d("MainActivity", "onBillingError: ");
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!bp.handleActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        if (bp != null) {
-            bp.release();
-        }
-        super.onDestroy();
-    }
 
 }

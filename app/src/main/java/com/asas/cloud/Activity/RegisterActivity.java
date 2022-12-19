@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -30,8 +31,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     TextView Name, Email, Password;
     Button Register;
-    private FirebaseAuth mAuth;
+    FirebaseAuth mAuth;
     ProgressDialog pd;
+    boolean exist;
     //UserModel userModel; // new UserModel();
 
     @Override
@@ -66,9 +68,6 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "please full field", Toast.LENGTH_LONG).show();
                 } else {
                     sunip(email1, password1, name1);
-
-
-
                 }
             }
         });
@@ -91,11 +90,40 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     private void sunip(String email1, String password1, String name) {
+        mAuth.fetchSignInMethodsForEmail(email1).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
+            @Override
+            public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
+                //boolean email= !task.getResult().
+                // email not existed
+                // email existed
+                //exist = task.getResult().getSignInMethods().size() == 0;
+                if(task.getResult().getSignInMethods().size()==0){
+                    checkEmail(email1, password1, name);
+                }else{
+                    pd.dismiss();
+                    Toast.makeText(RegisterActivity.this, "Email already exist ", Toast.LENGTH_SHORT).show();
+                    //exist=false;
+                }
+
+            }
+        });
+
+
+
+
+        //reference.
+
+
+
+    }
+    public void checkEmail(String email1, String password1, String name){
+
         mAuth.createUserWithEmailAndPassword(email1, password1)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+
                             // Sign in success, update UI with the signed-in user's information
                             //Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
@@ -116,7 +144,7 @@ public class RegisterActivity extends AppCompatActivity {
                             Intent intent = new Intent(RegisterActivity.this, CreateUserActivity.class);
                             intent.putExtra("name", name);
                             intent.putExtra("email", email1);
-                            intent.putExtra("user_id", user.getUid());
+                            intent.putExtra("image","1");
                             startActivity(intent);
                         }else {
                             pd.dismiss();
@@ -124,7 +152,6 @@ public class RegisterActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-
+        //return exist;
     }
 }

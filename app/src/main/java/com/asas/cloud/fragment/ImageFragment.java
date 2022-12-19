@@ -1,6 +1,7 @@
 package com.asas.cloud.fragment;
 
 import static android.app.Activity.RESULT_OK;
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -20,7 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +28,7 @@ import com.asas.cloud.Model.ImageModel;
 import com.asas.cloud.Model.VideoModel;
 import com.asas.cloud.R;
 import com.asas.cloud.adapter.ImageAdapter;
+import com.asas.cloud.adapter.ImageMain;
 import com.asas.cloud.classes.ImageResize;
 import com.asas.cloud.classes.References;
 import com.asas.cloud.classes.Uttilties;
@@ -50,8 +51,10 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 public class ImageFragment extends Fragment {
@@ -81,6 +84,9 @@ public class ImageFragment extends Fragment {
     String totale_size, use_size;
     long tootle, use;
     DatabaseReference user_storage= References.User_Reference;//database.getReference();
+    List<ImageModel> list;
+    boolean ads;
+    ImageMain mainVideo;
 
 
 
@@ -91,6 +97,7 @@ public class ImageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_image, container, false);
 
         button = view.findViewById(R.id.plus_image);
+        button.setVisibility(View.GONE);
         recyclerView = view.findViewById(R.id.image_recycler_view);
 
         auth = FirebaseAuth.getInstance();
@@ -102,16 +109,64 @@ public class ImageFragment extends Fragment {
                 .setQuery(databaseReference.child(user_id), ImageModel.class)
                 .build();
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),1);
-        recyclerView.setLayoutManager( new GridLayoutManager(getContext(),3, LinearLayoutManager.VERTICAL,false));
-        //gridLayoutManager.setReverseLayout(true);
-        recyclerView.setItemAnimator(null);
+        References.ADS_Reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String ads1= snapshot.child("ads").getValue().toString();
+                if (ads1.equals("true")){
+                    ads=true;
+                }else{
+                    ads=false;
+                }
 
-        //recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         adapter = new ImageAdapter(options);
-        //adapter.notifyDataSetChanged();
-        //adapter.setClickListener(this);
-        recyclerView.setAdapter(adapter);
+        list = new ArrayList<>();
+        list.clear();
+        // = new FileMain()
+        mainVideo = new ImageMain(getActivity(), list);
+
+        References.Image_Reference.child(user_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for(DataSnapshot ds: snapshot.getChildren()){
+
+                    ImageModel model = ds.getValue(ImageModel.class);
+                    //list = new ArrayList<>();
+                    //list.clear();
+                    list.add(model);
+                    mainVideo.notifyDataSetChanged();
+                    //Toast.makeText(getContext(), list.get(0).getVideo_Name(), Toast.LENGTH_SHORT).show();
+
+                }
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        //recyclerView.setLayoutManager( new GridLayoutManager(getContext(),4, LinearLayoutManager.VERTICAL,false));
+        //gridLayoutManager.setReverseLayout(true);
+        //recyclerView.setLayoutManager(LinearLayoutManager.HORIZONTAL);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        //recyclerView.setItemAnimator(null);
+        recyclerView.setLayoutManager(mLayoutManager);
+        if(ads==true) {
+            recyclerView.setAdapter(mainVideo);
+        }else{
+            recyclerView.setAdapter(adapter);
+        }
         user_storage.child(user_id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

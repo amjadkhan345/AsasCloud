@@ -1,7 +1,5 @@
 package com.asas.cloud.Model;
 
-import android.provider.ContactsContract;
-
 import java.util.Date;
 
 public class VideoModel {

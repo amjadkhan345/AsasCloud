@@ -40,7 +40,6 @@
             android:background="@color/teal_200"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-
             app:layout_constraintTop_toTopOf="parent"
             app:tabTextColor="@color/black"
             app:tabIndicatorFullWidth="false"
@@ -54,7 +53,7 @@
                 android:id="@+id/home_tab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Video" />
+                android:icon="@drawable/ic_video" />
 
 
 
@@ -62,7 +61,23 @@
                 android:id="@+id/profile_tab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Image" />
+                android:icon="@drawable/ic_image"/>
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/file_tab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_file" />
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/audio_tab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_audio" />
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/contact_tab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_contacts" />
 
 
 
@@ -73,12 +88,29 @@
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/vpeger"
+        android:layout_width="wrap_content"
         android:layout_height="630dp"
+        android:layout_marginBottom="3dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lenir"
-        android:layout_width="wrap_content">
-
+        app:layout_constraintTop_toBottomOf="@+id/lenir">
     </androidx.viewpager.widget.ViewPager>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/popup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:src="@drawable/ic_add"
+        android:layout_marginEnd="@dimen/margin30"
+        android:layout_marginRight="@dimen/margin32"
+        android:layout_marginBottom="@dimen/margin30"
+        app:layout_constraintBottom_toBottomOf="@+id/vpeger"
+        app:layout_constraintEnd_toEndOf="parent">
+
+    </com.google.android.material.floatingactionbutton.FloatingActionButton>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

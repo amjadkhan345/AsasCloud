@@ -1,5 +1,6 @@
 package com.asas.cloud.Activity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,8 +13,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.asas.cloud.Model.ApiControler;
+import com.asas.cloud.Model.Response;
 import com.asas.cloud.R;
-import com.asas.cloud.classes.CallApi;
 import com.asas.cloud.classes.Uttilties;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,6 +24,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import retrofit2.Call;
+import retrofit2.Callback;
 //import com.asas.cloud.classes.SendMail;
 
 //import com.asas.cloud.classes.SendMail;
@@ -82,18 +87,48 @@ public class LoginWithPasswordActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String code = Uttilties.createRandomCode(6);
 
-                String res= CallApi.sendmail(code,LoginWithPasswordActivity.this, useremail);
-                if(res.equals("sent")) {
-                    Intent intent = new Intent(LoginWithPasswordActivity.this, Otp_loginActivity.class);
-                    intent.putExtra("otp", code);
-                    intent.putExtra("type", "1");
-                    startActivity(intent);
-                    finish();
-                }else if(res.equals("filed")){
-                    Toast.makeText(LoginWithPasswordActivity.this, "Something went wrong, You can try again ", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(LoginWithPasswordActivity.this, "network error, check your internet connection and try again ", Toast.LENGTH_LONG).show();
-                }
+                //String res = CallApi.sendmail(code,BiomatricActivity.this, useremail);
+                String senderEmail = "asaskhan039@gmail.com";
+                //String message =  code ;
+                String subject = "Verification Code";
+                //String ReseverEmail = "ak4806030@gmail.com";
+                ProgressDialog progressBar = new ProgressDialog(LoginWithPasswordActivity.this);
+                progressBar.setTitle("Sending Email");
+
+                progressBar.setCancelable(false);
+
+                progressBar.show();
+
+
+                Call<Response> call= ApiControler.getInstance()
+                        .getapi()
+                        .sendmail(useremail, subject, code, senderEmail);
+                call.enqueue(new Callback<Response>() {
+                    @Override
+                    public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+                        Response response1 = response.body();
+                        if (response1.getMessage().equals("sent")){
+                            Intent intent=new Intent(getApplicationContext(), Otp_loginActivity.class);
+                            intent.putExtra("otp", code);
+                            intent.putExtra("type","1");
+                            startActivity(intent);
+                            finish();
+                            //res= "sent";//response1.getMessage();
+                            progressBar.dismiss();
+
+                        }else {
+                            progressBar.dismiss();
+                            Toast.makeText(getApplicationContext(), "Something went wrong, You can try again ", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Response> call, Throwable t) {
+                        progressBar.dismiss();
+                        Toast.makeText(getApplicationContext(), "network error, check your internet connection and try again ", Toast.LENGTH_LONG).show();
+
+                    }
+                });
             }
 
 

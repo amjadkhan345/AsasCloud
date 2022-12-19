@@ -26,6 +26,9 @@ public class References {
 
 
     public static final DatabaseReference Video_Reference = reference.child("Video");
+    public static final DatabaseReference AUDIO_Reference = reference.child("Audio");
+    public static final DatabaseReference CONTACT_Reference = reference.child("Contacts");
     public static final DatabaseReference Image_Reference = reference.child("Image");
     public static final DatabaseReference File_Reference = reference.child("File");
+    public static final DatabaseReference ADS_Reference = reference.child("ADS");
 }

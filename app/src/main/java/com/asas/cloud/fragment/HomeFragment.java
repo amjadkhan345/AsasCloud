@@ -2,6 +2,8 @@ package com.asas.cloud.fragment;
 
 import static android.app.Activity.RESULT_OK;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -28,6 +30,7 @@ import com.asas.cloud.Activity.MainActivity;
 import com.asas.cloud.Model.ImageModel;
 import com.asas.cloud.Model.VideoModel;
 import com.asas.cloud.R;
+import com.asas.cloud.adapter.MainVideo;
 import com.asas.cloud.adapter.VideoAdapter;
 import com.asas.cloud.classes.ImageResize;
 import com.asas.cloud.classes.References;
@@ -54,6 +57,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 public class HomeFragment extends Fragment {
@@ -64,12 +68,15 @@ public class HomeFragment extends Fragment {
     byte[] image;
     String imgString;
     Bitmap bitmap ;
+    List<VideoModel> list = new ArrayList<>();
+    MainVideo mainVideo;
 
     private Uri ImageUri;
     ArrayList ImageList = new ArrayList();
     private int upload_count = 0;
     private ProgressDialog progressDialog;
     ArrayList urlStrings;
+    boolean ads;
 
     FirebaseStorage storage = FirebaseStorage.getInstance();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -90,6 +97,7 @@ public class HomeFragment extends Fragment {
     String user_id, username, userprofile,user_uuid;
     String totale_size, use_size;
     int tootle, use;
+    FirebaseRecyclerOptions<VideoModel> options;
 
 
 
@@ -99,26 +107,75 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         button = view.findViewById(R.id.plus_video);
+        button.setVisibility(View.GONE);
         recyclerView = view.findViewById(R.id.video_recycler_view);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         user_id = user.getUid();
-        FirebaseRecyclerOptions<VideoModel> options
-                = new FirebaseRecyclerOptions.Builder<VideoModel>()
+        options= new FirebaseRecyclerOptions.Builder<VideoModel>()
                 .setQuery(databaseReference.child(user_id), VideoModel.class)
                 .build();
+        //ads=true;
+        References.ADS_Reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String ads1= snapshot.child("ads").getValue().toString();
+                if (ads1.equals("true")){
+                    ads=true;
+                }else{
+                    ads=false;
+                }
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),2);
-        LinearLayoutManager layoutManager= new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        recyclerView.setLayoutManager( new GridLayoutManager(getContext(),3, LinearLayoutManager.VERTICAL,false));
-        //gridLayoutManager.setReverseLayout(true);
-        recyclerView.setItemAnimator(null);
+            }
 
-        //recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         adapter = new VideoAdapter(options);
-        //adapter.notifyDataSetChanged();
-        //adapter.setClickListener(this);
-        recyclerView.setAdapter(adapter);
+        list.clear();
+        mainVideo = new MainVideo(getActivity(), list);
+
+        References.Video_Reference.child(user_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for(DataSnapshot ds: snapshot.getChildren()){
+
+                    VideoModel model = ds.getValue(VideoModel.class);
+                    //list = new ArrayList<>();
+                    //list.clear();
+                    list.add(model);
+                    mainVideo.notifyDataSetChanged();
+                    //Toast.makeText(getContext(), list.get(0).getVideo_Name(), Toast.LENGTH_SHORT).show();
+
+                }
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        //recyclerView.setLayoutManager( new GridLayoutManager(getContext(),4, LinearLayoutManager.VERTICAL,false));
+        //gridLayoutManager.setReverseLayout(true);
+        //recyclerView.setLayoutManager(LinearLayoutManager.HORIZONTAL);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        //recyclerView.setItemAnimator(null);
+        recyclerView.setLayoutManager(mLayoutManager);
+        if(ads==true) {
+            recyclerView.setAdapter(mainVideo);
+        }else{
+            recyclerView.setAdapter(adapter);
+        }
+
+
+
+
         user_storage.child(user_id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -363,6 +420,21 @@ public class HomeFragment extends Fragment {
 
         }
 
+        private void withoutads(){
+
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),2);
+            LinearLayoutManager layoutManager= new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+            recyclerView.setLayoutManager( new GridLayoutManager(getContext(),4, LinearLayoutManager.VERTICAL,false));
+            //gridLayoutManager.setReverseLayout(true);
+            recyclerView.setItemAnimator(null);
+
+            //recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+            //adapter.notifyDataSetChanged();
+            //adapter.setClickListener(this);
+            recyclerView.setAdapter(adapter);
+        }
+
 
 
 
@@ -464,6 +536,36 @@ public class HomeFragment extends Fragment {
 
 
 
+    }
+    private  void withads(){
+
+        mainVideo = new MainVideo(getActivity(), list);
+
+        References.Video_Reference.child(user_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for(DataSnapshot ds: snapshot.getChildren()){
+
+                    VideoModel model = ds.getValue(VideoModel.class);
+                    list = new ArrayList<>();
+                    list.add(model);
+
+                }
+                mainVideo.notifyDataSetChanged();
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        recyclerView.setLayoutManager( new GridLayoutManager(getContext(),4, LinearLayoutManager.VERTICAL,false));
+        //gridLayoutManager.setReverseLayout(true);
+        recyclerView.setItemAnimator(null);
+        recyclerView.setAdapter(mainVideo);
     }
 
     @Override

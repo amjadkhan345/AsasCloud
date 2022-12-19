@@ -35,8 +35,11 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +47,7 @@ import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
     boolean checkBox11;
+    boolean userexist;
 
 
     TextView email,password, forget_password, reg_btn, pravicy_url;
@@ -73,7 +77,9 @@ public class LoginActivity extends AppCompatActivity {
         facebook11.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                Intent intent=new Intent(LoginActivity.this, FacebookLoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivity(intent);
                 finish();
             }
         });
@@ -245,6 +251,8 @@ public class LoginActivity extends AppCompatActivity {
                     userModel.setName(name);
                     userModel.setEmail(email1);
                     userModel.setProfileurl(profile);
+                    userModel.setUser_storage(20000000);
+                    userModel.setSize(0);
                     reference.child(user.getUid()).setValue(userModel);
 
 
@@ -403,11 +411,22 @@ public class LoginActivity extends AppCompatActivity {
                             userModel.setPhoneNumber("Your phone number");
                             userModel.setCountry("Your Country");
                             userModel.setAge("Your age");
+                            userModel.setUser_storage(20000000);
+                            userModel.setSize(0);
                             userModel.setProfileurl(account.getPhotoUrl().toString());
-                            reference.child(user.getUid()).setValue(userModel);
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+
+                                        //checkEmail(email1, password1, name);
+                            Intent intent = new Intent(LoginActivity.this, CreateUserActivity.class);
+                                        //intent.putExtra()
+                            intent.putExtra("name", account.getDisplayName());
+                            intent.putExtra("email", account.getEmail());
+                            intent.putExtra("image", account.getPhotoUrl().toString());
                             startActivity(intent);
                             finish();
+
+
+
+
                         } else {
                             Toast.makeText(LoginActivity.this, "Error in login 123 ", Toast.LENGTH_SHORT).show();
                         }
@@ -450,7 +469,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         private void updateUI(FirebaseUser user) {
                             progressDialog.dismiss();
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, CreateUserActivity.class);
                             startActivity(intent);
 
                         }
@@ -461,5 +480,33 @@ public class LoginActivity extends AppCompatActivity {
         }
 
 
+    }
+    //DatabaseReference ref=FirebaseDatabase.getInstance().getReference().child("Users");
+//.orderByChild("username").equalTo(Nick123).addValueEventListener(new ValueEventListener(){
+       // @Override
+        //public void onDataChange(DataSnapshot dataSnapshot){
+          ///  if(dataSnapshot.exist() {
+                //username exist
+           // }
+       // }
+    public boolean userExist(String userid, String email){
+        reference.child("User").orderByChild("name").equalTo(email).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    //return true;
+                    userexist= true;
+                }else{
+                    userexist = false;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        return  userexist;
     }
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/p_image"
+        android:title="Image"
+        android:icon="@drawable/ic_image"/>
+
+    <item android:id="@+id/p_video"
+        android:title="Video"
+        android:icon="@drawable/ic_video"/>
+
+
+    <item android:id="@+id/p_file"
+        android:title="File"
+        android:icon="@drawable/ic_file"/>
+
+    <item android:id="@+id/p_contact"
+        android:title="Contact"
+        android:icon="@drawable/ic_contacts"/>
+
+    <item android:id="@+id/p_audio"
+        android:title="Audio"
+        android:icon="@drawable/ic_audio"/>
+
+</menu>
