@@ -32,7 +32,9 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoModel, VideoAdapt
      * {@link FirebaseRecyclerOptions} for configuration options.
      *
      * @param options
+     *
      */
+    //public static ProgressBar progressBar;
     public VideoAdapter(@NonNull FirebaseRecyclerOptions<VideoModel> options) {
         super(options);
     }
@@ -88,8 +90,13 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoModel, VideoAdapt
             filename = itemView.findViewById(R.id.name11);
             data = itemView.findViewById(R.id.data11);
             layout = itemView.findViewById(R.id.l_view11);
+            //progressBar= itemView.findViewById(R.id.progress_home);
+
+
 
 
         }
     }
+
+
 }

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +36,15 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -71,18 +81,43 @@ public class PlayVideoActivity extends AppCompatActivity {
     FirebaseUser user;
     String user_id, id, type, videoname, audioname;
     int position;
+    boolean ads;
     VideoModel model;
     AudioModel audioModel;
+    InterstitialAd interstitial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_video);
-        list=new ArrayList<>();
-        type=getIntent().getStringExtra("type");
+        list = new ArrayList<>();
+        type = getIntent().getStringExtra("type");
         id = getIntent().getStringExtra("id");
         url1 = getIntent().getStringExtra("url");
-        //position= getIntent().getIntExtra("position", 1);
+        References.ADS_Reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String ads1 = snapshot.child("ads").getValue().toString();
+                if (ads1.equals("true")) {
+                    ads = true;
+                } else {
+                    ads = false;
+                }
+
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
 
 
         toolbar = findViewById(R.id.toolbar55);
@@ -102,8 +137,8 @@ public class PlayVideoActivity extends AppCompatActivity {
         databaseReference.child(user_id).child(id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    videoname= snapshot.child("video_Name").getValue().toString();
+                if (snapshot.exists()) {
+                    videoname = snapshot.child("video_Name").getValue().toString();
                 }
 
 
@@ -117,7 +152,7 @@ public class PlayVideoActivity extends AppCompatActivity {
         References.AUDIO_Reference.child(user_id).child(id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
+                if (snapshot.exists()) {
                     audioname = snapshot.child("video_Name").getValue().toString();
 
                 }
@@ -153,6 +188,27 @@ public class PlayVideoActivity extends AppCompatActivity {
         setting = playerView.findViewById(R.id.exo_track_selection_view);
         speedBtn = playerView.findViewById(R.id.exo_playback_speed);
         TextView speedTxt = playerView.findViewById(R.id.speed);
+        AdRequest adRequest = new AdRequest.Builder().build();
+
+        InterstitialAd.load(this, getString(R.string.admob_Interstitial_id), adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        // The mInterstitialAd reference will be null until
+                        // an ad is loaded.
+                        PlayVideoActivity.this.interstitial = interstitialAd;
+                        Log.i(TAG, "onAdLoaded");
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        // Handle the error
+                        Log.d(TAG, loadAdError.toString());
+                        interstitial = null;
+                    }
+                });
+
+
 
 
         speedBtn.setOnClickListener(new View.OnClickListener() {
@@ -306,28 +362,20 @@ public class PlayVideoActivity extends AppCompatActivity {
                 }
             }
         });
+        //if
+        //adload();
 
 
-    }
-
-    protected void releasePlayer() {
-        if (simpleExoPlayer != null) {
-            simpleExoPlayer.release();
-            simpleExoPlayer = null;
-            trackSelector = null;
-        }
 
     }
-
-
     @Override
-    public void onStop() {
+    public void onStop () {
         super.onStop();
         releasePlayer();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu (Menu menu){
         // Inflate the menu, this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.pleymain, menu);
         return true;
@@ -335,27 +383,67 @@ public class PlayVideoActivity extends AppCompatActivity {
 
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected (@NonNull MenuItem item){
         int item_id = item.getItemId();
         if (item_id == R.id.download) {
-            if(type.equals("video")) {
+            if (type.equals("video")) {
                 Uttilties.downloadManager(this, url1, videoname);
                 Toast.makeText(this, "Download start....", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(PlayVideoActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }else if (type.equals("audio")){
+                if (ads) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            //myintent();
+                            if (interstitial != null) {
+                                simpleExoPlayer.stop(true);
+                                adload();
+                                interstitial.show(PlayVideoActivity.this);
+                            } else {
+                                Log.d("TAG", "The interstitial ad wasn't ready yet.");
+                                startActivity(intent);
+                                finish();
+                            }
+                        }
+                    }, 2000);
+                }else {
+                    startActivity(intent);
+                    finish();
+
+                }
+
+
+            } else if (type.equals("audio")) {
                 Uttilties.downloadManager(this, url1, audioname);
                 Toast.makeText(this, "Download start....", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(PlayVideoActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                if (ads) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            //myintent();
+                            if (interstitial != null) {
+                                simpleExoPlayer.stop(true);
+                                adload();
+                                interstitial.show(PlayVideoActivity.this);
+                            } else {
+                                Log.d("TAG", "The interstitial ad wasn't ready yet.");
+                                startActivity(intent);
+                                finish();
+                            }
+                        }
+                    }, 2000);
+                }else {
+                    startActivity(intent);
+                    finish();
+
+                }
 
             }
 
 
         } else if (item_id == R.id.delete) {
-            FirebaseStorage storage=FirebaseStorage.getInstance();
+            FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference photoRef = storage.getReferenceFromUrl(url1);
 
             photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -382,6 +470,63 @@ public class PlayVideoActivity extends AppCompatActivity {
 
         }
         return super.onOptionsItemSelected(item);
-    }
 
 }
+
+
+
+    protected void releasePlayer() {
+        if (simpleExoPlayer != null) {
+            simpleExoPlayer.release();
+            simpleExoPlayer = null;
+            trackSelector = null;
+        }
+
+
+    }
+
+    private void adload(){
+        interstitial.setFullScreenContentCallback(new FullScreenContentCallback() {
+            @Override
+            public void onAdClicked() {
+                // Called when a click is recorded for an ad.
+                Log.d(TAG, "Ad was clicked.");
+            }
+
+            @Override
+            public void onAdDismissedFullScreenContent() {
+                // Called when ad is dismissed.
+                // Set the ad reference to null so you don't show the ad a second time.
+                Log.d(TAG, "Ad dismissed fullscreen content.");
+                interstitial = null;
+                Intent intent = new Intent(PlayVideoActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+
+            }
+
+            @Override
+            public void onAdFailedToShowFullScreenContent(AdError adError) {
+                // Called when ad fails to show.
+                Log.e(TAG, "Ad failed to show fullscreen content.");
+                interstitial = null;
+            }
+
+            @Override
+            public void onAdImpression() {
+                // Called when an impression is recorded for an ad.
+                Log.d(TAG, "Ad recorded an impression.");
+            }
+
+            @Override
+            public void onAdShowedFullScreenContent() {
+                // Called when ad is shown.
+                Log.d(TAG, "Ad showed fullscreen content.");
+            }
+        });
+
+    }
+
+
+}
+

@@ -43,6 +43,11 @@ import com.asas.cloud.classes.ImageResize;
 import com.asas.cloud.classes.References;
 import com.asas.cloud.classes.Uttilties;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -63,8 +68,10 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     final int IMAGE_CODE=100;
@@ -97,6 +104,15 @@ public class MainActivity extends AppCompatActivity {
 
     //FirebaseAuth auth;
     //FirebaseUser user;
+    AdView adView;
+    AdView mAdView;
+    public static final int MULTIPLE_PERMISSIONS = 10; // code you want.
+
+    String[] permissions= new String[]{
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_CONTACTS,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.READ_EXTERNAL_STORAGE};
 
 
     FragmentContainerView fragment;
@@ -107,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager;
     PagerAdapter adapter;
     Toolbar toolbar;
+    boolean ads = false;
     DatabaseReference reference= References.User_Reference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +133,44 @@ public class MainActivity extends AppCompatActivity {
         user = auth.getCurrentUser();
         user_id = user.getUid();
         button=findViewById(R.id.popup);
+
+
+
+        if (!checkPermissions()){
+            checkPermissions();
+        }
+        //  permissions  granted.
+
+
+        References.ADS_Reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String ads1= snapshot.child("ads").getValue().toString();
+                if (ads1.equals("true")){
+                    ads=true;
+                }else{
+                    ads=false;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+                //Toast.makeText(MainActivity.this, " successful ", Toast.LENGTH_SHORT).show();
+            }
+        });
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        if(ads) {
+            mAdView.loadAd(adRequest);
+        }
+
         References.User_Reference.child(user_id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -139,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
 
         }
+
         button.setOnClickListener(new View.OnClickListener() {
             //@RequiresApi(api = Build.VERSION_CODES.Q)
             @SuppressLint("RestrictedApi")
@@ -247,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        askPermissions();
+        //askPermissions();
         //home = findViewById(R.id.home);
         //notification = findViewById(R.id.notification);
         //create_file = findViewById(R.id.create_file);
@@ -349,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
 
         }else if(item_id== R.id.invite){
             final String appPackageName = "https://play.google.com/store/apps/details?id=" + getPackageName();//getPackageName();//"com."; // your application package name
-            String send_string= "this app provide you 20 GB free spase to store your data.i recommend this app \n" + appPackageName;
+            String send_string= "Asascloud provide you 20 GB free space to store your data. i recommend this app \n" + appPackageName;
             //startActivity(new Intent(Intent.ACTION_VIEW,
             // Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
             Intent sendIntent = new Intent();
@@ -358,6 +414,9 @@ public class MainActivity extends AppCompatActivity {
             sendIntent.setType("text/plain");
             Intent shareIntent = Intent.createChooser(sendIntent, null);
             startActivity(shareIntent);
+        }else if(item_id== R.id.rate){
+            final String appPackageName = "https://play.google.com/store/apps/details?id=" + getPackageName();//getPackageName();//"com."; // your application package name
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(appPackageName)));
         }
         else {
             //Intent intent = new Intent(this, PlayStoreActivity.class);
@@ -373,6 +432,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static final int STORAGE_PERMISSION_REQUEST_CODE = 1;
+
+    private  boolean checkPermissions() {
+        int result;
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String p:permissions) {
+            result = ContextCompat.checkSelfPermission(getApplicationContext(),p);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p);
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),MULTIPLE_PERMISSIONS );
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissionsList[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissionsList, grantResults);
+        switch (requestCode) {
+            case MULTIPLE_PERMISSIONS: {
+                if (grantResults.length > 0) {
+                    String permissionsDenied = "";
+                    for (String per : permissionsList) {
+                        if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                            permissionsDenied += "\n" + per;
+
+                        }
+
+                    }
+                    // Show permissionsDenied
+                    //updateViews();
+                }
+                return;
+            }
+        }
+    }
 
 
     private void askPermissions() {

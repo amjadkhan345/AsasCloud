@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -57,6 +58,7 @@ public class FileFragment extends Fragment {
     FloatingActionButton button;
     RecyclerView recyclerView;
     int  FILE_SELECT_CODE = 101;
+    ProgressBar progressBar;
 
     FirebaseStorage storage = FirebaseStorage.getInstance();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -94,6 +96,7 @@ public class FileFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         user_id = user.getUid();
+        progressBar=view.findViewById(R.id.progress_file);
 
         FirebaseRecyclerOptions<FileModel> options
                 = new FirebaseRecyclerOptions.Builder<FileModel>()
@@ -134,6 +137,7 @@ public class FileFragment extends Fragment {
                     //list.clear();
                     list.add(model);
                     mainVideo.notifyDataSetChanged();
+                    progressBar.setVisibility(View.GONE);
                     //Toast.makeText(getContext(), list.get(0).getVideo_Name(), Toast.LENGTH_SHORT).show();
 
                 }
@@ -151,7 +155,7 @@ public class FileFragment extends Fragment {
         //gridLayoutManager.setReverseLayout(true);
         //recyclerView.setLayoutManager(LinearLayoutManager.HORIZONTAL);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        //recyclerView.setItemAnimator(null);
+        recyclerView.setItemAnimator(null);
         recyclerView.setLayoutManager(mLayoutManager);
         if(ads==true) {
             recyclerView.setAdapter(mainVideo);

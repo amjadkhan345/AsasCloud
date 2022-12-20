@@ -16,6 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/search_view" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/plus_video"
         android:layout_width="wrap_content"
@@ -25,9 +26,17 @@
         android:layout_marginRight="22dp"
         android:layout_marginBottom="32dp"
 
-        android:src="@drawable/ic_add"
+        android:contentDescription="@string/app_name"
 
-         />
+        android:minHeight="48dp"
+        android:src="@drawable/ic_add" />
+
+    <ProgressBar
+        android:id="@+id/progress_home"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        />
 
 
 </FrameLayout>

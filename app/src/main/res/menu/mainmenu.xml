@@ -16,6 +16,8 @@
 
     <item android:id="@+id/invite"
         android:title="Invite Friends"/>
+    <item android:id="@+id/rate"
+        android:title="Rate us in Store"/>
 
     <item android:id="@+id/reate_us"
         android:title="Logout" />

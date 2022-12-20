@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -34,7 +33,7 @@ public class AudioMain extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int ITEM_VIEW = 0;
     private static final int AD_VIEW = 1;
-    private static final int ITEM_FEED_COUNT = 5;
+    private static final int ITEM_FEED_COUNT = 10;
     private final Activity activity;
     private final List<AudioModel> mainList;
 
@@ -52,7 +51,7 @@ public class AudioMain extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             View view = layoutInflater.inflate(R.layout.video_item, parent, false);
             return new AudioMain.ViewHolder(view);
         } else if (viewType == AD_VIEW) {
-            View view = layoutInflater.inflate(R.layout.layout_ad, parent, false);
+            View view = layoutInflater.inflate(R.layout.ads, parent, false);
             return new AudioMain.AdViewHolder(view);
         } else {
             return null;
@@ -208,7 +207,7 @@ public class AudioMain extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public class AdViewHolder extends RecyclerView.ViewHolder {
 
         //LayoutAdBinding binding;
-        FrameLayout adLayout;
+        ConstraintLayout adLayout;
 
         public AdViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -217,7 +216,7 @@ public class AudioMain extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         private void bindAdData() {
-            AdLoader.Builder builder = new AdLoader.Builder(activity, "ca-app-pub-3940256099942544/2247696110")
+            AdLoader.Builder builder = new AdLoader.Builder(activity, activity.getString(R.string.admob_niteve_id))
                     .forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
                         @Override
                         public void onNativeAdLoaded(@NonNull NativeAd nativeAd) {

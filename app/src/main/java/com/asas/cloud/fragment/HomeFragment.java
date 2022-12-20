@@ -16,6 +16,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -77,6 +78,7 @@ public class HomeFragment extends Fragment {
     private ProgressDialog progressDialog;
     ArrayList urlStrings;
     boolean ads;
+    ProgressBar progressBar;
 
     FirebaseStorage storage = FirebaseStorage.getInstance();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -109,6 +111,7 @@ public class HomeFragment extends Fragment {
         button = view.findViewById(R.id.plus_video);
         button.setVisibility(View.GONE);
         recyclerView = view.findViewById(R.id.video_recycler_view);
+        progressBar = view.findViewById(R.id.progress_home);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         user_id = user.getUid();
@@ -134,6 +137,7 @@ public class HomeFragment extends Fragment {
             }
         });
         adapter = new VideoAdapter(options);
+        //progressBar.setVisibility(View.GONE);
         list.clear();
         mainVideo = new MainVideo(getActivity(), list);
 
@@ -148,6 +152,10 @@ public class HomeFragment extends Fragment {
                     //list.clear();
                     list.add(model);
                     mainVideo.notifyDataSetChanged();
+                    //notifyItemRangeRemoved
+                   // getApplicationContext().notifyItemRangeRemoved
+                    //mainVideo.notifyItemRangeInserted
+                    progressBar.setVisibility(View.GONE);
                     //Toast.makeText(getContext(), list.get(0).getVideo_Name(), Toast.LENGTH_SHORT).show();
 
                 }
@@ -165,7 +173,7 @@ public class HomeFragment extends Fragment {
         //gridLayoutManager.setReverseLayout(true);
         //recyclerView.setLayoutManager(LinearLayoutManager.HORIZONTAL);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        //recyclerView.setItemAnimator(null);
+        recyclerView.setItemAnimator(null);
         recyclerView.setLayoutManager(mLayoutManager);
         if(ads==true) {
             recyclerView.setAdapter(mainVideo);

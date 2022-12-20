@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.asas.cloud.Model.ContactModel;
@@ -36,7 +36,7 @@ public class ContactMain extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int ITEM_VIEW = 0;
     private static final int AD_VIEW = 1;
-    private static final int ITEM_FEED_COUNT = 5;
+    private static final int ITEM_FEED_COUNT = 10;
     private final Activity activity;
     private final List<ContactModel> mainList;
 
@@ -54,7 +54,7 @@ public class ContactMain extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             View view = layoutInflater.inflate(R.layout.contacts_row, parent, false);
             return new ContactMain.ImageViewHolder(view);
         } else if (viewType == AD_VIEW) {
-            View view = layoutInflater.inflate(R.layout.layout_ad, parent, false);
+            View view = layoutInflater.inflate(R.layout.ads, parent, false);
             return new ContactMain.AdViewHolder(view);
         } else {
             return null;
@@ -236,7 +236,7 @@ public class ContactMain extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public class AdViewHolder extends RecyclerView.ViewHolder {
 
         //LayoutAdBinding binding;
-        FrameLayout adLayout;
+        ConstraintLayout adLayout;
 
         public AdViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -245,7 +245,7 @@ public class ContactMain extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         private void bindAdData() {
-            AdLoader.Builder builder = new AdLoader.Builder(activity, "ca-app-pub-3940256099942544/2247696110")
+            AdLoader.Builder builder = new AdLoader.Builder(activity, activity.getString(R.string.admob_niteve_id))
                     .forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
                         @Override
                         public void onNativeAdLoaded(@NonNull NativeAd nativeAd) {

@@ -116,39 +116,44 @@ public class ChackPoscodeActivity extends AppCompatActivity {
             progressBar.setCancelable(false);
 
             progressBar.show();
+            if (useremail == null) {
+                progressBar.dismiss();
+                Toast.makeText(context, "You login from facebook reinstall the app and login", Toast.LENGTH_LONG).show();
+            } else {
+                Call<Response> call = ApiControler.getInstance()
+                        .getapi()
+                        .sendmail(useremail, subject, code, senderEmail);
+                call.enqueue(new Callback<Response>() {
+                    @Override
+                    public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+                        Response response1 = response.body();
+                        if (response1.getMessage().equals("sent")) {
+                            Intent intent = new Intent(context, Otp_loginActivity.class);
+                            intent.putExtra("otp", code);
+                            intent.putExtra("type", "1");
+                            startActivity(intent);
+                            finish();
+                            //res= "sent";//response1.getMessage();
+                            progressBar.dismiss();
 
-
-            Call<Response> call= ApiControler.getInstance()
-                    .getapi()
-                    .sendmail(useremail, subject, code, senderEmail);
-            call.enqueue(new Callback<Response>() {
-                @Override
-                public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
-                    Response response1 = response.body();
-                    if (response1.getMessage().equals("sent")){
-                        Intent intent=new Intent(context, Otp_loginActivity.class);
-                        intent.putExtra("otp", code);
-                        intent.putExtra("type","1");
-                        startActivity(intent);
-                        finish();
-                        //res= "sent";//response1.getMessage();
-                        progressBar.dismiss();
-
-                    }else {
-                        progressBar.dismiss();
-                        Toast.makeText(context, "Something went wrong, You can try again ", Toast.LENGTH_LONG).show();
+                        } else {
+                            progressBar.dismiss();
+                            Toast.makeText(context, "Something went wrong, You can try again ", Toast.LENGTH_LONG).show();
+                        }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<Response> call, Throwable t) {
-                    progressBar.dismiss();
-                    Toast.makeText(context, "network error, check your internet connection and try again ", Toast.LENGTH_LONG).show();
+                    @Override
+                    public void onFailure(Call<Response> call, Throwable t) {
+                        progressBar.dismiss();
+                        Toast.makeText(context, "network error, check your internet connection and try again ", Toast.LENGTH_LONG).show();
 
-                }
-            });
-
+                    }
+                });
+            }
         }
         return super.onOptionsItemSelected(item);
+
     }
+
+
 }

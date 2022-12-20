@@ -23,4 +23,7 @@
     <string name="highly_experience">Highly Experience</string>
     <string name="enter_amount">Enter custom amount...</string>
     <string name="add_to_wallet">Add to wallet</string>
+    <string name="admob_banner_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="admob_niteve_id">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="admob_Interstitial_id">ca-app-pub-3940256099942544/1033173712</string>
 </resources>

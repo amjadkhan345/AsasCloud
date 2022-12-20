@@ -15,6 +15,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -87,6 +88,7 @@ public class ImageFragment extends Fragment {
     List<ImageModel> list;
     boolean ads;
     ImageMain mainVideo;
+    ProgressBar progressBar;
 
 
 
@@ -103,6 +105,7 @@ public class ImageFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         user_id = user.getUid();
+        progressBar = view.findViewById(R.id.progress_image);
 
         FirebaseRecyclerOptions<ImageModel> options
                 = new FirebaseRecyclerOptions.Builder<ImageModel>()
@@ -143,6 +146,7 @@ public class ImageFragment extends Fragment {
                     //list.clear();
                     list.add(model);
                     mainVideo.notifyDataSetChanged();
+                    progressBar.setVisibility(View.GONE);
                     //Toast.makeText(getContext(), list.get(0).getVideo_Name(), Toast.LENGTH_SHORT).show();
 
                 }
@@ -160,7 +164,7 @@ public class ImageFragment extends Fragment {
         //gridLayoutManager.setReverseLayout(true);
         //recyclerView.setLayoutManager(LinearLayoutManager.HORIZONTAL);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        //recyclerView.setItemAnimator(null);
+        recyclerView.setItemAnimator(null);
         recyclerView.setLayoutManager(mLayoutManager);
         if(ads==true) {
             recyclerView.setAdapter(mainVideo);

@@ -76,8 +76,8 @@ public class ProductActivity extends AppCompatActivity {
         });
         isBillingClientConnected.setValue(false);
 
-        List<String> nonConsumablesList = Collections.singletonList("subscription");//Arrays.asList("10_gb_space", "30_gb_space", "50_gb_space", "100_gb_space");
-        List<String> consumablesList = Arrays.asList("10_gb_space", "30_gb_space", "50_gb_space", "100_gb_space");
+        List<String> nonConsumablesList = Arrays.asList("10_gb_space", "30_gb_space", "50_gb_space", "100_gb_space");
+        List<String> consumablesList = Collections.singletonList("subscription");////Arrays.asList("10_gb_space", "30_gb_space", "50_gb_space", "100_gb_space");
         //Collections.singletonList("subscription");
         List<String> subsList = Collections.singletonList("subscription");
 

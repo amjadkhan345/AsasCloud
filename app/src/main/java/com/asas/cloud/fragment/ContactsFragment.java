@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -82,6 +83,7 @@ public class ContactsFragment extends Fragment {
     List<ContactModel> list;
     boolean ads;
     ContactMain mainVideo;
+    ProgressBar progressBar;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -133,6 +135,7 @@ public class ContactsFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         user_id = user.getUid();
+        progressBar=view.findViewById(R.id.progress_contact);
         FirebaseRecyclerOptions<ContactModel> options
                 = new FirebaseRecyclerOptions.Builder<ContactModel>()
                 .setQuery(References.CONTACT_Reference.child(user_id), ContactModel.class)
@@ -171,6 +174,7 @@ public class ContactsFragment extends Fragment {
                     //list.clear();
                     list.add(model);
                     mainVideo.notifyDataSetChanged();
+                    progressBar.setVisibility(View.GONE);
                     //Toast.makeText(getContext(), list.get(0).getVideo_Name(), Toast.LENGTH_SHORT).show();
 
                 }
@@ -188,7 +192,7 @@ public class ContactsFragment extends Fragment {
         //gridLayoutManager.setReverseLayout(true);
         //recyclerView.setLayoutManager(LinearLayoutManager.HORIZONTAL);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        //recyclerView.setItemAnimator(null);
+        recyclerView.setItemAnimator(null);
         recyclerView.setLayoutManager(mLayoutManager);
         if(ads==true) {
             recyclerView.setAdapter(mainVideo);

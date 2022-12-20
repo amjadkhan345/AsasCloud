@@ -57,7 +57,7 @@ public class FileAdapter extends FirebaseRecyclerAdapter<FileModel, FileAdapter.
         //holder.img.;
         SimpleDateFormat simpleDate =  new SimpleDateFormat("dd/MM/yyyy");
         String strDt = simpleDate.format(model.getData());
-        //holder.data.setText(model.getFile_Name());
+        holder.data.setText(strDt);
         holder.img.setImageResource(R.drawable.pdf);
         holder.filename.setText(model.getFile_Name());
         holder.layout.setLongClickable(true);

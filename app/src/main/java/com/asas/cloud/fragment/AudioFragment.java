@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -79,6 +80,7 @@ public class AudioFragment extends Fragment {
     List<AudioModel> list;
     boolean ads;
     AudioMain mainVideo;
+    ProgressBar progressBar;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -129,6 +131,7 @@ public class AudioFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         user_id = user.getUid();
+        progressBar =view.findViewById(R.id.progress_audio);
         FirebaseRecyclerOptions<AudioModel> options
                 = new FirebaseRecyclerOptions.Builder<AudioModel>()
                 .setQuery(References.AUDIO_Reference.child(user_id), AudioModel.class)
@@ -168,6 +171,7 @@ public class AudioFragment extends Fragment {
                     //list.clear();
                     list.add(model);
                     mainVideo.notifyDataSetChanged();
+                    progressBar.setVisibility(View.GONE);
                     //Toast.makeText(getContext(), list.get(0).getVideo_Name(), Toast.LENGTH_SHORT).show();
 
                 }
@@ -185,7 +189,7 @@ public class AudioFragment extends Fragment {
         //gridLayoutManager.setReverseLayout(true);
         //recyclerView.setLayoutManager(LinearLayoutManager.HORIZONTAL);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        //recyclerView.setItemAnimator(null);
+        recyclerView.setItemAnimator(null);
         recyclerView.setLayoutManager(mLayoutManager);
         if(ads==true) {
             recyclerView.setAdapter(mainVideo);

@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -36,9 +35,10 @@ public class MainVideo extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private static final int ITEM_VIEW = 0;
     private static final int AD_VIEW = 1;
-    private static final int ITEM_FEED_COUNT = 5;
+    private static final int ITEM_FEED_COUNT = 10;
     private final Activity activity;
     private final List<VideoModel> mainList;
+    //private static ProgressBar progressBar;
 
     public MainVideo(Activity activity, List<VideoModel> mainList) {
         this.activity = activity;
@@ -53,7 +53,7 @@ public class MainVideo extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             View view = layoutInflater.inflate(R.layout.video_item, parent, false);
             return new MainViewHolder(view);
         } else if (viewType == AD_VIEW) {
-            View view = layoutInflater.inflate(R.layout.layout_ad, parent, false);
+            View view = layoutInflater.inflate(R.layout.ads, parent, false);
             return new AdViewHolder(view);
         } else {
             return null;
@@ -86,6 +86,8 @@ public class MainVideo extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
         return ITEM_VIEW;
     }
+
+
 
     private void populateNativeADView(NativeAd nativeAd, NativeAdView adView) {
         // Set the media view.
@@ -178,6 +180,7 @@ public class MainVideo extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             filename = itemView.findViewById(R.id.name11);
             data = itemView.findViewById(R.id.data11);
             layout = itemView.findViewById(R.id.l_view11);
+            //progressBar=itemView.findViewById(R.id.progress_home);
         }
 
 
@@ -201,13 +204,14 @@ public class MainVideo extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 }
             });
 
+
         }
     }
 
     public class AdViewHolder extends RecyclerView.ViewHolder {
 
         //LayoutAdBinding binding;
-        FrameLayout adLayout;
+        ConstraintLayout adLayout;
 
         public AdViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -216,7 +220,7 @@ public class MainVideo extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
 
         private void bindAdData() {
-            AdLoader.Builder builder = new AdLoader.Builder(activity, "ca-app-pub-3940256099942544/2247696110")
+            AdLoader.Builder builder = new AdLoader.Builder(activity, activity.getString(R.string.admob_niteve_id))
                     .forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
                         @Override
                         public void onNativeAdLoaded(@NonNull NativeAd nativeAd) {
@@ -238,4 +242,7 @@ public class MainVideo extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             adLoader.loadAd(new AdRequest.Builder().build());
         }
     }
+
+
+
 }
